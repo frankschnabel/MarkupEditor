@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37027.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkupEditor", "MarkupEditor.csproj", "{A1CAEBF4-5D81-4FCF-A563-5B6E5C28E407}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkupEditor.Tests", "MarkupEditor.Tests\MarkupEditor.Tests.csproj", "{8A1570B0-B252-44E0-8AEB-6EC20C76317E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1CAEBF4-5D81-4FCF-A563-5B6E5C28E407}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1CAEBF4-5D81-4FCF-A563-5B6E5C28E407}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1CAEBF4-5D81-4FCF-A563-5B6E5C28E407}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1CAEBF4-5D81-4FCF-A563-5B6E5C28E407}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A1570B0-B252-44E0-8AEB-6EC20C76317E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A1570B0-B252-44E0-8AEB-6EC20C76317E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A1570B0-B252-44E0-8AEB-6EC20C76317E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A1570B0-B252-44E0-8AEB-6EC20C76317E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08C345CD-6432-4067-A631-9C0AC627A133}
+	EndGlobalSection
+EndGlobal

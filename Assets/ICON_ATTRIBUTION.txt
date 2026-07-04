@@ -1,0 +1,11 @@
+Application icon (document sheet, "page facing up" emoji) derived from:
+
+  Noto Emoji (Google LLC)
+  https://github.com/googlefonts/noto-emoji
+
+Licensed under the Apache License, Version 2.0.
+You may obtain a copy of the license at:
+  https://www.apache.org/licenses/LICENSE-2.0
+
+The distributed icon file (app.ico) was resized from the Noto PNG glyph
+emoji_u1f4c4.png and combined into a multi-resolution .ico for Windows.
