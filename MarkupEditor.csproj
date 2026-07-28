@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>MarkupEditor</RootNamespace>
     <AssemblyName>MarkupEditor</AssemblyName>
-    <ApplicationIcon>Properties\images.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\images.ico</ApplicationIcon>
     <Deterministic>true</Deterministic>
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -15,9 +15,11 @@
 	<ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
 	<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
 	<ApplicationManifest>app.manifest</ApplicationManifest>
+	<PackageIcon>images.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Markdig" Version="0.37.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3485.44" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
@@ -44,6 +46,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Update="Assets\images.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="Properties\images.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -53,6 +63,6 @@
     <None Include="Assets\app.ico" />
     <None Include="Assets\app-icon-source.png" />
     <None Include="Assets\ICON_ATTRIBUTION.txt" />
-    <Content Include="Properties\images.ico" />
+    <Content Include="Assets\images.ico" />
   </ItemGroup>
 </Project>

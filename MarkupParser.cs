@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.IO;
 using Markdig;
@@ -28,6 +27,18 @@ internal static class MarkupParser
         .Build();
 
     /// <summary>
+    /// Pipeline with raw HTML passthrough enabled (not safe for untrusted input).
+    /// </summary>
+    private static readonly MarkdownPipeline MarkdownPipelineWithHtml = new MarkdownPipelineBuilder()
+        .UsePipeTables()
+        .UseGridTables()
+        .UseTaskLists()
+        .UseAutoLinks()
+        .UseEmphasisExtras()
+        .UseFootnotes()
+        .Build();
+
+    /// <summary>
     /// Wraps an HTML body fragment in a complete, styled HTML document (includes script for caret-line highlight).
     /// </summary>
     /// <param name="body">The inner HTML body content.</param>
@@ -44,7 +55,7 @@ internal static class MarkupParser
             "t=document.getElementById(\"me-line-\"+i);" +
             "if(t)break;" +
             "}" +
-            "if(t){t.style.backgroundColor=\"#fff3cd\";t.style.borderRadius=\"4px\";mePreviewLastLineEl=t;}" +
+            "if(t){t.scrollIntoView(true);t.style.backgroundColor=\"#fff3cd\";t.style.borderRadius=\"4px\";mePreviewLastLineEl=t;}" +
             "else{mePreviewLastLineEl=null;}" +
             "}</script>";
 
@@ -84,19 +95,21 @@ internal static class MarkupParser
     /// Converts a Markdown source string into an HTML body fragment using Markdig (CommonMark + GFM-oriented extensions).
     /// </summary>
     /// <param name="source">The raw markup text to convert.</param>
+    /// <param name="allowHtml"><see langword="true"/> to render raw HTML passthrough; <see langword="false"/> (default) to escape it.</param>
     /// <returns>An HTML string representing the formatted document body.</returns>
-    internal static string ConvertMarkupToHtml(string source)
+    internal static string ConvertMarkupToHtml(string source, bool allowHtml = false)
     {
         string normalized = source.Replace("\r\n", "\n").Replace("\r", "\n");
 
         if (normalized.Length == 0) return "<p id=\"me-line-0\"></p>";
 
-        MarkdownDocument document = Markdown.Parse(normalized, MarkdownPipeline);
+        MarkdownPipeline pipeline = allowHtml ? MarkdownPipelineWithHtml : MarkdownPipeline;
+        MarkdownDocument document = Markdown.Parse(normalized, pipeline);
         PreviewLineAnchorUtility.AssignPreviewLineAnchors(document);
 
         StringWriter writer = new(CultureInfo.InvariantCulture);
         HtmlRenderer renderer = new(writer);
-        MarkdownPipeline.Setup(renderer);
+        pipeline.Setup(renderer);
         renderer.Render(document);
 
         return writer.ToString();

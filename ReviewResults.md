@@ -26,7 +26,7 @@ The review below applies the **spirit** of ReviewAgents where it fits: **securit
 | Severity | File | Line | Issue |
 |----------|------|------|--------|
 | Low | `ReviewAgents.md` | 11 | Typo: **"fille"** should be **"file"** (instructions for `ReviewResults.md`). |
-| Low | `AGENTS.md` | 42 | **Inconsistency:** lists **`Assets/app.ico`** as the application icon asset, while **`AGENTS.md`** lines 59–60 and **`MarkupEditor.csproj`** line 9 correctly describe **`app2.ico`** as `ApplicationIcon`. Align line 42 with `app2.ico` or clarify both icons’ roles. |
+| Low | `AGENTS.md` | 42 | **Inconsistency:** lists **`Assets/app.ico`** as the application icon asset, while **`AGENTS.md`** lines 59–60 and **`MarkupEditor.csproj`** line 9 correctly describe **`images.ico`** as `ApplicationIcon`. Align line 42 with `images.ico` or clarify both icons’ roles. |
 | Info | `.gitignore` | 51 | **`/ReviewResults.md`** is ignored, so review outputs are **not committed** by default. If teams need review history in Git, remove or narrow this rule. |
 
 ### Security & compliance
@@ -80,3 +80,19 @@ The review below applies the **spirit** of ReviewAgents where it fits: **securit
 ## Summary
 
 **MarkupEditor** does not implement the **Kubra/SQL/biller** profile described in **ReviewAgents.md**; those requirements should be treated as **out of scope** for this repo. Against the **transferable** ReviewAgents themes (security, hygiene, quality), the codebase is in **good shape**, with **minor documentation fixes** (**`AGENTS.md`** line 42, **`ReviewAgents.md`** line 11) and **informational** notes on logging, exit codes, large-document behavior, and `.gitignore` vs. committing **`ReviewResults.md`**.
+
+---
+
+## Delta review (2026-07-24)
+
+Scope reviewed:
+- `MarkupEditor.cs` splitter/layout updates for monitor DPI/zoom transitions.
+- `Agents.md` documentation updates for splitter behavior.
+
+Findings:
+- No new high-, medium-, or low-severity defects identified in the reviewed changes.
+- ReviewAgents items related to Kubra, SQL, billers, and KEIS remain not applicable to this WinForms editor.
+- Engineering-hygiene requirement to document behavior changes is satisfied by updates in `Agents.md`.
+
+Conclusion:
+- The current code changes pass code review under the applicable portions of `ReviewAgents.md`.

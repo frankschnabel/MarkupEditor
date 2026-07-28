@@ -4,19 +4,29 @@ A small **Windows Forms** editor for **Markdown** with a **live HTML preview**. 
 
 ## Features
 
-- Split view: **editor** (left) and **HTML preview** (right)
-- **Debounced** automatic preview while typing (optional **Live Preview** in Tools → Settings)
-- **File** menu: New, Open, Save, Save As, **Recent documents** (last 10), Exit
-- Unsaved-change prompts when closing or switching documents
+- Split view with selectable orientation: **vertical** (editor left, preview right) or **horizontal** (editor top, preview bottom)
+- **Debounced** automatic preview while typing, backed by **WebView2** for modern Chromium-based rendering
+- **Tools** → **Settings...** (`Ctrl+,`) opens a custom dialog for:
+	- Live Preview
+	- Word Wrap
+	- Horizontal Split
+	- Line Numbers
+	- Allow Raw HTML in Preview
+	- Editor font size
+- **File** menu: New, Open, Reload, Save, Save As, **Export as HTML**, **Recent documents** (last 10), Exit
+- Unsaved-change prompts when closing, creating a new document, opening another file, or reloading from disk
+- External file-change detection: if the open file is modified, renamed, or deleted by another process, the app alerts you and offers to reload when appropriate
 - UTF-8 open/save; optional **command-line path** to open a file on startup (works with file associations)
-- **Preview follows the caret**: scroll and highlight the block for the current line
-- Settings remembered between sessions: live preview, word wrap, font size, splitter distance, window layout
-- **Help** → Supported Markup summarizes the syntax and policies (including safe preview: raw HTML in the source is not executed)
+- **Preview follows the caret**: the rendered block for the current source line is scrolled into view and highlighted
+- Optional **line-number gutter** for the editor when word wrap is off
+- Settings remembered between sessions: live preview, word wrap, split orientation, line numbers, raw HTML policy, font size, splitter distance, and window layout
+- **Help** → Supported Markup summarizes the syntax and preview behavior
 
 ## Requirements
 
 - **Windows**
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) on Windows, or **Visual Studio 2022** with the .NET desktop workload
+- **WebView2 Runtime** on the target machine for the preview pane (typically already present on Windows 10/11 systems with Microsoft Edge)
 
 ## Build and run
 
@@ -52,12 +62,15 @@ You can also open the solution in Visual Studio and press **F5**.
 
 ## Supported markup
 
-The preview follows **CommonMark**-style rules plus enabled extensions (see **Help** in the app). Highlights include headings, block quotes, lists (including task lists), fenced code blocks, pipe/grid tables, links and images (inline and reference-style), footnotes, autolinks, and strikethrough. Raw HTML in the document is **not** interpreted in the preview (escaped for safety).
+The preview follows **CommonMark**-style rules plus enabled extensions (see **Help** in the app). Highlights include headings, block quotes, lists (including task lists), fenced code blocks, pipe/grid tables, links and images (inline and reference-style), footnotes, autolinks, and strikethrough.
+
+By default, raw HTML in the source is **not** interpreted in the preview and is escaped for safety. If you enable **Allow Raw HTML in Preview** in **Tools** → **Settings...**, raw HTML passthrough is enabled for the current session and persisted in user settings.
 
 ## Limitations
 
-- Exact behavior and edge cases follow **Markdig**’s pipeline and version.
-- Preview uses the WinForms **`WebBrowser`** control (**legacy MSHTML/IE** host surface). Rendering and script behavior reflect that environment.
+- Exact behavior and edge cases follow **Markdig**'s pipeline and version.
+- The preview depends on the installed **WebView2 Runtime**.
+- Line numbers are only shown when **Word Wrap** is disabled; the gutter is hidden while wrapping is enabled.
 
 ## Repository layout
 
@@ -65,6 +78,9 @@ The preview follows **CommonMark**-style rules plus enabled extensions (see **He
 |------|------|
 | `MarkupEditor.sln` | Solution |
 | `MarkupEditor.cs` / `MarkupEditor.Designer.cs` | Main form and UI layout |
+| `SettingsDialog.cs` / `SettingsDialog.Designer.cs` | Custom modal Settings dialog |
+| `LineNumberPanel.cs` | Custom editor gutter for logical line numbers |
+| `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` | Find / replace dialog |
 | `MarkupParser.cs` / `PreviewLineAnchorUtility.cs` | Markdown → HTML (Markdig) and preview line ids |
 | `MarkupEditor.Tests/` | Parser smoke tests (MSTest) |
 | `Program.cs` | Entry point |

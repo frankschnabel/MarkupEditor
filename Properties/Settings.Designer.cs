@@ -143,5 +143,65 @@ namespace MarkupEditor.Properties
                 this["RecentDocuments"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HorizontalSplit
+        {
+            get
+            {
+                return ((bool)(this["HorizontalSplit"]));
+            }
+            set
+            {
+                this["HorizontalSplit"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowRawHtml
+        {
+            get
+            {
+                return ((bool)(this["AllowRawHtml"]));
+            }
+            set
+            {
+                this["AllowRawHtml"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowLineNumbers
+        {
+            get
+            {
+                return ((bool)(this["ShowLineNumbers"]));
+            }
+            set
+            {
+                this["ShowLineNumbers"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2000")]
+        public int SelfSaveWatcherSuppressMilliseconds
+        {
+            get
+            {
+                return ((int)(this["SelfSaveWatcherSuppressMilliseconds"]));
+            }
+            set
+            {
+                this["SelfSaveWatcherSuppressMilliseconds"] = value;
+            }
+        }
     }
 }

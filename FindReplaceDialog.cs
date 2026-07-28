@@ -79,7 +79,7 @@ internal sealed partial class FindReplaceDialog : Form
         StringComparison comparison = matchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
 
         string text = _targetTextBox.Text;
-        StringBuilder result = new StringBuilder(text.Length);
+        StringBuilder result = new(text.Length);
         int last = 0;
         int replaced = 0;
 
@@ -162,9 +162,7 @@ internal sealed partial class FindReplaceDialog : Form
 
         if (!string.Equals(slice, find, comparison)) return false;
 
-        if (!_wholeWordCheckBox.Checked) return true;
-
-        return IsWholeWordMatch(_targetTextBox.Text, _targetTextBox.SelectionStart, find.Length);
+        return !_wholeWordCheckBox.Checked || IsWholeWordMatch(_targetTextBox.Text, _targetTextBox.SelectionStart, find.Length);
     }
 
     /// <summary>
@@ -185,9 +183,9 @@ internal sealed partial class FindReplaceDialog : Form
     /// </summary>
     /// <param name="wrap">When true, continues from the beginning if no match is found after the caret.</param>
     /// <returns>True when a match was selected.</returns>
-    private bool TryFindNext(bool wrap)
+    private void TryFindNext(Boolean wrap)
     {
-        if (!ValidateFindText()) return false;
+        if (!ValidateFindText()) return;
 
         string find = _findTextBox.Text;
         bool matchCase = _matchCaseCheckBox.Checked;
@@ -206,14 +204,12 @@ internal sealed partial class FindReplaceDialog : Form
         {
             MessageBox.Show(this, "The search text was not found.", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            return false;
+            return;
         }
 
         _targetTextBox.Select(found, find.Length);
         _targetTextBox.ScrollToCaret();
         _targetTextBox.Focus();
-
-        return true;
     }
 
     /// <summary>
@@ -243,9 +239,7 @@ internal sealed partial class FindReplaceDialog : Form
     {
         if (index > 0 && IsWordCharacter(text[index - 1])) return false;
 
-        if (index + length < text.Length && IsWordCharacter(text[index + length])) return false;
-
-        return true;
+        return index + length >= text.Length || !IsWordCharacter(text[index + length]);
     }
 
     private static bool IsWordCharacter(char c) => char.IsLetterOrDigit(c) || c == '_';
