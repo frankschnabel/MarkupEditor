@@ -1,7 +1,8 @@
-using System.Collections.Generic;
-using System.Globalization;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace MarkupEditor;
 
@@ -17,7 +18,7 @@ internal static class PreviewLineAnchorUtility
     /// <param name="document">The parsed markdown document.</param>
     internal static void AssignPreviewLineAnchors(MarkdownDocument document)
     {
-        HashSet<int> assignedLines = new();
+        HashSet<Int32> assignedLines = [];
 
         foreach (MarkdownObject descendant in document.Descendants())
         {
@@ -32,9 +33,9 @@ internal static class PreviewLineAnchorUtility
 
             HtmlAttributes attributes = descendant.GetAttributes();
 
-            if (!string.IsNullOrEmpty(attributes.Id)) continue;
+            if (!String.IsNullOrEmpty(attributes.Id)) continue;
 
-            int line = block.Line;
+            Int32 line = block.Line;
 
             if (line < 0) continue;
 

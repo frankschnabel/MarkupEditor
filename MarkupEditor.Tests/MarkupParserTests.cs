@@ -1,5 +1,5 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace MarkupEditor.Tests;
 
@@ -12,7 +12,7 @@ public sealed class MarkupParserTests
     [TestMethod]
     public void ConvertMarkupToHtml_Headings_AllLevels()
     {
-        string html = MarkupParser.ConvertMarkupToHtml("###### Tiny\n");
+        String html = MarkupParser.ConvertMarkupToHtml("###### Tiny\n");
 
         StringAssert.Contains(html, "<h6");
     }
@@ -24,7 +24,7 @@ public sealed class MarkupParserTests
     public void ConvertMarkupToHtml_PipeTable_ContainsTableTag()
     {
         const String md = "| a | b |\n|---|---|\n| 1 | 2 |\n";
-        string html = MarkupParser.ConvertMarkupToHtml(md);
+        String html = MarkupParser.ConvertMarkupToHtml(md);
 
         StringAssert.Contains(html, "<table");
     }
@@ -36,7 +36,7 @@ public sealed class MarkupParserTests
     public void ConvertMarkupToHtml_FencedCode_ContainsPre()
     {
         const String md = "```csharp\nint x = 1;\n```\n";
-        string html = MarkupParser.ConvertMarkupToHtml(md);
+        String html = MarkupParser.ConvertMarkupToHtml(md);
 
         StringAssert.Contains(html, "<pre");
         StringAssert.Contains(html, "<code");
@@ -48,7 +48,7 @@ public sealed class MarkupParserTests
     [TestMethod]
     public void ConvertMarkupToHtml_Strikethrough_ContainsDel()
     {
-        string html = MarkupParser.ConvertMarkupToHtml("~~gone~~\n");
+        String html = MarkupParser.ConvertMarkupToHtml("~~gone~~\n");
 
         StringAssert.Contains(html, "<del");
     }
@@ -59,7 +59,7 @@ public sealed class MarkupParserTests
     [TestMethod]
     public void ConvertMarkupToHtml_AutoLink_ContainsHref()
     {
-        string html = MarkupParser.ConvertMarkupToHtml("Visit https://example.com today.\n");
+        String html = MarkupParser.ConvertMarkupToHtml("Visit https://example.com today.\n");
 
         StringAssert.Contains(html, "href=\"https://example.com\"");
     }
@@ -70,7 +70,7 @@ public sealed class MarkupParserTests
     [TestMethod]
     public void ConvertMarkupToHtml_RawHtml_IsEscapedOrStripped()
     {
-        string html = MarkupParser.ConvertMarkupToHtml("<script>alert(1)</script>\n");
+        String html = MarkupParser.ConvertMarkupToHtml("<script>alert(1)</script>\n");
 
         Assert.IsFalse(html.Contains("<script>alert"));
     }
@@ -82,7 +82,7 @@ public sealed class MarkupParserTests
     public void ConvertMarkupToHtml_ReferenceLink_ContainsAnchor()
     {
         const String md = "[ref][id]\n\n[id]: https://example.com\n";
-        string html = MarkupParser.ConvertMarkupToHtml(md);
+        String html = MarkupParser.ConvertMarkupToHtml(md);
 
         StringAssert.Contains(html, "href=\"https://example.com\"");
     }
@@ -94,7 +94,7 @@ public sealed class MarkupParserTests
     public void ConvertMarkupToHtml_ImageReference_ContainsImg()
     {
         const String md = "![alt][pic]\n\n[pic]: https://example.com/x.png\n";
-        string html = MarkupParser.ConvertMarkupToHtml(md);
+        String html = MarkupParser.ConvertMarkupToHtml(md);
 
         StringAssert.Contains(html, "<img");
         StringAssert.Contains(html, "src=\"https://example.com/x.png\"");
@@ -106,7 +106,7 @@ public sealed class MarkupParserTests
     [TestMethod]
     public void ConvertMarkupToHtml_BlockQuote_ContainsBlockquote()
     {
-        string html = MarkupParser.ConvertMarkupToHtml("> quoted\n");
+        String html = MarkupParser.ConvertMarkupToHtml("> quoted\n");
 
         StringAssert.Contains(html, "<blockquote");
     }
@@ -117,7 +117,7 @@ public sealed class MarkupParserTests
     [TestMethod]
     public void ConvertMarkupToHtml_TaskList_ContainsCheckbox()
     {
-        string html = MarkupParser.ConvertMarkupToHtml("- [ ] todo\n");
+        String html = MarkupParser.ConvertMarkupToHtml("- [ ] todo\n");
 
         StringAssert.Contains(html, "checkbox");
     }
@@ -128,8 +128,35 @@ public sealed class MarkupParserTests
     [TestMethod]
     public void ConvertMarkupToHtml_PreviewLineId_OnFirstBlock()
     {
-        string html = MarkupParser.ConvertMarkupToHtml("# Title\n");
+        String html = MarkupParser.ConvertMarkupToHtml("# Title\n");
 
         StringAssert.Contains(html, "id=\"me-line-0\"");
+    }
+
+    /// <summary>
+    /// TeX export emits a full document shell and basic inline formatting.
+    /// </summary>
+    [TestMethod]
+    public void ConvertMarkupToLatexDocument_BasicFormatting()
+    {
+        const String md = "# Heading\n\nSome **bold** and [link](https://example.com).\n";
+        String tex = MarkupParser.ConvertMarkupToLatexDocument(md);
+
+        StringAssert.Contains(tex, "\\documentclass{article}");
+        StringAssert.Contains(tex, "\\section{Heading}");
+        StringAssert.Contains(tex, "\\textbf{bold}");
+        StringAssert.Contains(tex, "\\href{https://example.com}{link}");
+        StringAssert.Contains(tex, "\\end{document}");
+    }
+
+    /// <summary>
+    /// TeX export escapes special characters that are significant to LaTeX.
+    /// </summary>
+    [TestMethod]
+    public void ConvertMarkupToLatexDocument_EscapesSpecialCharacters()
+    {
+        String tex = MarkupParser.ConvertMarkupToLatexDocument("price is 100% & tax\n");
+
+        StringAssert.Contains(tex, "100\\% \\& tax");
     }
 }

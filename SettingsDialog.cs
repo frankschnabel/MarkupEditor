@@ -17,7 +17,8 @@ internal sealed partial class SettingsDialog : Form
     /// <param name="showLineNumbers">Whether the line number gutter is visible.</param>
     /// <param name="allowRawHtml">Whether raw HTML passthrough is enabled in the preview.</param>
     /// <param name="fontSize">Current editor font size in points.</param>
-    public SettingsDialog(bool livePreview, bool wordWrap, bool horizontalSplit, bool showLineNumbers, bool allowRawHtml, float fontSize)
+    public SettingsDialog(Boolean livePreview, Boolean wordWrap, Boolean horizontalSplit, Boolean showLineNumbers,
+        Boolean allowRawHtml, Single fontSize)
     {
         InitializeComponent();
 
@@ -26,31 +27,31 @@ internal sealed partial class SettingsDialog : Form
         _horizontalSplitCheckBox.Checked = horizontalSplit;
         _showLineNumbersCheckBox.Checked = showLineNumbers;
         _allowRawHtmlCheckBox.Checked = allowRawHtml;
-        _fontSizeUpDown.Value = (decimal)Math.Max(8f, Math.Min(28f, fontSize));
+        _fontSizeUpDown.Value = (Decimal)Math.Max(8f, Math.Min(28f, fontSize));
     }
 
     /// <summary>Gets the live preview setting chosen by the user.</summary>
-    public bool LivePreview => _livePreviewCheckBox.Checked;
+    public Boolean LivePreview => _livePreviewCheckBox.Checked;
 
     /// <summary>Gets the word wrap setting chosen by the user.</summary>
-    public bool WordWrap => _wordWrapCheckBox.Checked;
+    public Boolean WordWrap => _wordWrapCheckBox.Checked;
 
     /// <summary>Gets the horizontal split setting chosen by the user.</summary>
-    public bool HorizontalSplit => _horizontalSplitCheckBox.Checked;
+    public Boolean HorizontalSplit => _horizontalSplitCheckBox.Checked;
 
     /// <summary>Gets the show line numbers setting chosen by the user.</summary>
-    public bool ShowLineNumbers => _showLineNumbersCheckBox.Checked;
+    public Boolean ShowLineNumbers => _showLineNumbersCheckBox.Checked;
 
     /// <summary>Gets the allow raw HTML setting chosen by the user.</summary>
-    public bool AllowRawHtml => _allowRawHtmlCheckBox.Checked;
+    public Boolean AllowRawHtml => _allowRawHtmlCheckBox.Checked;
 
     /// <summary>Gets the editor font size chosen by the user.</summary>
-    public float FontSize => (float)_fontSizeUpDown.Value;
+    public Single FontSize => (Single)_fontSizeUpDown.Value;
 
     /// <summary>
     /// Closes the dialog, accepting the current values.
     /// </summary>
-    private void _okButton_Click(object sender, EventArgs e)
+    private void _okButton_Click(Object sender, EventArgs e)
     {
         DialogResult = DialogResult.OK;
         Close();
@@ -59,7 +60,7 @@ internal sealed partial class SettingsDialog : Form
     /// <summary>
     /// Closes the dialog, discarding any changes.
     /// </summary>
-    private void _cancelButton_Click(object sender, EventArgs e)
+    private void _cancelButton_Click(Object sender, EventArgs e)
     {
         DialogResult = DialogResult.Cancel;
         Close();

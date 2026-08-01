@@ -1,16 +1,15 @@
+using MarkupEditor.Properties;
+using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
-
 // ReSharper disable once RedundantUsingDirective
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using MarkupEditor.Properties;
-using Microsoft.Web.WebView2.Core;
 
 // ReSharper disable InvalidXmlDocComment
 
@@ -22,28 +21,30 @@ internal sealed partial class MarkupEditor : Form
 {
     #region Fields and construction
 
-    private const int EmRedo = 0x0454;
-    private const int RecentDocumentsCapacity = 10;
-    private const int SplitterWidthAtDesignDpi = 5;
-    private const int DesignDpi = 96;
-    private const int SelfSaveWatcherSuppressMillisecondsDefault = 2000;
-    private const int SelfSaveWatcherSuppressMillisecondsMin = 0;
-    private const int SelfSaveWatcherSuppressMillisecondsMax = 30000;
+    private const Int32 EmRedo = 0x0454;
+    private const Int32 RecentDocumentsCapacity = 10;
+    private const Int32 SplitterWidthAtDesignDpi = 5;
+    private const Int32 DesignDpi = 96;
+    private const Int32 SelfSaveWatcherSuppressMillisecondsDefault = 2000;
+    private const Int32 SelfSaveWatcherSuppressMillisecondsMin = 0;
+    private const Int32 SelfSaveWatcherSuppressMillisecondsMax = 30000;
 
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+    private static extern IntPtr SendMessage(IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam);
 
-    private string _currentFilePath;
-    private bool _isDirty;
-    private bool _suppressDirtyFlag;
-    private bool _livePreviewEnabled;
-    private bool _previewReady;
-    private bool _allowRawHtml;
-    private int _selfSaveWatcherSuppressMilliseconds = SelfSaveWatcherSuppressMillisecondsDefault;
-    private int _pendingPreviewScrollLine = -1;
-    private double _splitterDistanceRatio = 0.5d;
+    private String _currentFilePath;
+    private Boolean _isDirty;
+    private Boolean _suppressDirtyFlag;
+    private Boolean _livePreviewEnabled;
+    private Boolean _previewReady;
+    private Boolean _allowRawHtml;
+    private Int32 _selfSaveWatcherSuppressMilliseconds = SelfSaveWatcherSuppressMillisecondsDefault;
+    private Int32 _pendingPreviewScrollLine = -1;
+    private Boolean _pendingPrintAfterRender;
+    private String _pendingPdfExportPath;
+    private Double _splitterDistanceRatio = 0.5d;
     private FileSystemWatcher _fileWatcher;
-    private bool _externalChangePending;
+    private Boolean _externalChangePending;
     private DateTime _ignoreFileWatcherEventsUntilUtc = DateTime.MinValue;
 
     /// <summary>
@@ -55,7 +56,7 @@ internal sealed partial class MarkupEditor : Form
     /// Initializes a new instance of the <see cref="MarkupEditor"/> form.
     /// </summary>
     /// <param name="commandLineFilePath">Optional path from the command line to open on startup.</param>
-    public MarkupEditor(string commandLineFilePath = null)
+    public MarkupEditor(String commandLineFilePath = null)
     {
         InitializeComponent();
         TryApplyApplicationIconFromExecutable();
@@ -79,9 +80,9 @@ internal sealed partial class MarkupEditor : Form
         LoadEditorSettingsFromStorage();
         RefreshRecentDocumentsMenu();
 
-        if (!string.IsNullOrWhiteSpace(commandLineFilePath))
+        if (!String.IsNullOrWhiteSpace(commandLineFilePath))
         {
-            string trimmedPath = commandLineFilePath.Trim().Trim('"');
+            String trimmedPath = commandLineFilePath.Trim().Trim('"');
             if (!TryOpenFileAtPath(trimmedPath)) LoadSampleDocument();
         }
         else
@@ -101,9 +102,9 @@ internal sealed partial class MarkupEditor : Form
     {
         try
         {
-            string path = Application.ExecutablePath;
+            String path = Application.ExecutablePath;
 
-            if (string.IsNullOrEmpty(path)) return;
+            if (String.IsNullOrEmpty(path)) return;
 
             using Icon extracted = Icon.ExtractAssociatedIcon(path);
             if (extracted != null) Icon = (Icon)extracted.Clone();
@@ -117,17 +118,17 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Handles the <see cref="Form.Load"/> event; restores window position and size from user settings.
     /// </summary>
-    private void MarkupEditor_Load(object sender, EventArgs e) => ApplyWindowSettingsFromStorage();
+    private void MarkupEditor_Load(Object sender, EventArgs e) => ApplyWindowSettingsFromStorage();
 
     /// <summary>
     /// Handles the <see cref="Form.Shown"/> event; configures the split panel layout and starts WebView2 initialization.
     /// </summary>
-    private void MarkupEditor_Shown(object sender, EventArgs e)
+    private void MarkupEditor_Shown(Object sender, EventArgs e)
     {
         LayoutMainSplitToVisibleClientArea();
         ApplySplitterWidthForCurrentDpi();
         ConfigureSafePanelMinimums();
-        int preferredDistance = GetPreferredSplitterDistanceForCurrentSize();
+        Int32 preferredDistance = GetPreferredSplitterDistanceForCurrentSize();
         SetSafeSplitterDistance(preferredDistance);
         UpdateSplitterRatioFromCurrentDistance();
         _ = _previewBrowser.EnsureCoreWebView2Async(null);
@@ -137,11 +138,11 @@ internal sealed partial class MarkupEditor : Form
     /// Applies the split orientation and resets the splitter to half the container size.
     /// </summary>
     /// <param name="horizontal"><see langword="true"/> for horizontal (top/bottom); <see langword="false"/> for vertical (left/right).</param>
-    private void ApplySplitOrientation(bool horizontal)
+    private void ApplySplitOrientation(Boolean horizontal)
     {
         _mainSplit.Orientation = horizontal ? Orientation.Horizontal : Orientation.Vertical;
         ConfigureSafePanelMinimums();
-        int half = GetSplitAxisLength() / 2;
+        Int32 half = GetSplitAxisLength() / 2;
         SetSafeSplitterDistance(half);
         UpdateSplitterRatioFromCurrentDistance();
     }
@@ -151,11 +152,11 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     private void ConfigureSafePanelMinimums()
     {
-        bool horizontal = _mainSplit.Orientation == Orientation.Horizontal;
-        int available = Math.Max(0, (horizontal ? _mainSplit.Height : _mainSplit.Width) - 20);
-        const int desired = 250;
-        int capped = available / 2;
-        int safeMin = Math.Max(50, Math.Min(desired, capped));
+        Boolean horizontal = _mainSplit.Orientation == Orientation.Horizontal;
+        Int32 available = Math.Max(0, (horizontal ? _mainSplit.Height : _mainSplit.Width) - 20);
+        const Int32 desired = 250;
+        Int32 capped = available / 2;
+        Int32 safeMin = Math.Max(50, Math.Min(desired, capped));
 
         _mainSplit.Panel1MinSize = safeMin;
         _mainSplit.Panel2MinSize = safeMin;
@@ -165,22 +166,24 @@ internal sealed partial class MarkupEditor : Form
     /// Sets the splitter position clamped within safe panel bounds.
     /// </summary>
     /// <param name="preferred">The desired splitter distance in pixels.</param>
-    private void SetSafeSplitterDistance(int preferred)
+    private void SetSafeSplitterDistance(Int32 preferred)
     {
-        bool horizontal = _mainSplit.Orientation == Orientation.Horizontal;
-        int min = _mainSplit.Panel1MinSize;
-        int max = (horizontal ? _mainSplit.Height : _mainSplit.Width) - _mainSplit.Panel2MinSize - _mainSplit.SplitterWidth;
+        Boolean horizontal = _mainSplit.Orientation == Orientation.Horizontal;
+        Int32 min = _mainSplit.Panel1MinSize;
+
+        Int32 max =
+            (horizontal ? _mainSplit.Height : _mainSplit.Width) - _mainSplit.Panel2MinSize - _mainSplit.SplitterWidth;
 
         if (max < min) return;
 
-        int clamped = Math.Min(Math.Max(preferred, min), max);
+        Int32 clamped = Math.Min(Math.Max(preferred, min), max);
         _mainSplit.SplitterDistance = clamped;
     }
 
     /// <summary>
     /// Handles split-container size changes; reapplies the tracked split ratio to keep panel proportions stable.
     /// </summary>
-    private void _mainSplit_SizeChanged(object sender, EventArgs e)
+    private void _mainSplit_SizeChanged(Object sender, EventArgs e)
     {
         if (!IsHandleCreated) return;
 
@@ -192,19 +195,19 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Handles splitter drag completion; stores the current splitter ratio for future resizes.
     /// </summary>
-    private void _mainSplit_SplitterMoved(object sender, SplitterEventArgs e) =>
+    private void _mainSplit_SplitterMoved(Object sender, SplitterEventArgs e) =>
         UpdateSplitterRatioFromCurrentDistance();
 
     /// <summary>
     /// Handles client-size changes; re-lays out the split container to fill the visible client area.
     /// </summary>
-    private void MarkupEditor_ClientSizeChanged(object sender, EventArgs e) =>
+    private void MarkupEditor_ClientSizeChanged(Object sender, EventArgs e) =>
         LayoutMainSplitToVisibleClientArea();
 
     /// <summary>
     /// Handles form DPI changes when moving across monitors; keeps splitter metrics stable.
     /// </summary>
-    private void MarkupEditor_DpiChanged(object sender, DpiChangedEventArgs e)
+    private void MarkupEditor_DpiChanged(Object sender, DpiChangedEventArgs e)
     {
         LayoutMainSplitToVisibleClientArea();
         ApplySplitterWidthForDpi(e.DeviceDpiNew);
@@ -219,10 +222,10 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     private void LayoutMainSplitToVisibleClientArea()
     {
-        int top = _menuStrip.Bottom;
-        int bottom = _statusStrip.Top;
-        int width = ClientSize.Width;
-        int height = Math.Max(0, bottom - top);
+        Int32 top = _menuStrip.Bottom;
+        Int32 bottom = _statusStrip.Top;
+        Int32 width = ClientSize.Width;
+        Int32 height = Math.Max(0, bottom - top);
 
         _mainSplit.Bounds = new Rectangle(0, top, width, height);
     }
@@ -236,9 +239,9 @@ internal sealed partial class MarkupEditor : Form
     /// Applies a deterministic splitter width for a target DPI.
     /// </summary>
     /// <param name="dpi">The target monitor DPI.</param>
-    private void ApplySplitterWidthForDpi(int dpi)
+    private void ApplySplitterWidthForDpi(Int32 dpi)
     {
-        int scaled = (int)Math.Round((double)SplitterWidthAtDesignDpi * dpi / DesignDpi);
+        Int32 scaled = (Int32)Math.Round((Double)SplitterWidthAtDesignDpi * dpi / DesignDpi);
         _mainSplit.SplitterWidth = Math.Max(3, scaled);
     }
 
@@ -246,7 +249,7 @@ internal sealed partial class MarkupEditor : Form
     /// Returns the split axis length in pixels for the current orientation.
     /// </summary>
     /// <returns>Width for vertical split or height for horizontal split.</returns>
-    private int GetSplitAxisLength() =>
+    private Int32 GetSplitAxisLength() =>
         _mainSplit.Orientation == Orientation.Horizontal ? _mainSplit.Height : _mainSplit.Width;
 
     /// <summary>
@@ -254,11 +257,11 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     private void UpdateSplitterRatioFromCurrentDistance()
     {
-        int axis = GetSplitAxisLength();
+        Int32 axis = GetSplitAxisLength();
 
         if (axis <= 0) return;
 
-        double ratio = (double)_mainSplit.SplitterDistance / axis;
+        Double ratio = (Double)_mainSplit.SplitterDistance / axis;
         _splitterDistanceRatio = Math.Max(0d, Math.Min(1d, ratio));
     }
 
@@ -266,30 +269,29 @@ internal sealed partial class MarkupEditor : Form
     /// Computes a preferred splitter distance for the current size from the tracked split ratio.
     /// </summary>
     /// <returns>A preferred splitter distance in pixels.</returns>
-    private int GetPreferredDistanceFromRatio() =>
-        (int)Math.Round(GetSplitAxisLength() * _splitterDistanceRatio);
+    private Int32 GetPreferredDistanceFromRatio() =>
+        (Int32)Math.Round(GetSplitAxisLength() * _splitterDistanceRatio);
 
     /// <summary>
     /// Computes the startup splitter distance for the current window size.
     /// If saved window bounds are available, scales the persisted splitter by the saved axis.
     /// </summary>
     /// <returns>A preferred splitter distance in pixels for startup.</returns>
-    private int GetPreferredSplitterDistanceForCurrentSize()
+    private Int32 GetPreferredSplitterDistanceForCurrentSize()
     {
         Settings s = Settings.Default;
-        int axis = GetSplitAxisLength();
+        Int32 axis = GetSplitAxisLength();
 
-        if (axis <= 0) return s.SplitterDistance;
+        if (axis <= 0 || !s.HasSavedWindowLayout) return s.SplitterDistance;
 
-        if (!s.HasSavedWindowLayout) return s.SplitterDistance;
-
-        int savedAxis = _mainSplit.Orientation == Orientation.Horizontal
-            ? s.MainWindowBounds.Height
-            : s.MainWindowBounds.Width;
+        Int32 savedAxis =
+            _mainSplit.Orientation == Orientation.Horizontal
+                ? s.MainWindowBounds.Height
+                : s.MainWindowBounds.Width;
 
         if (savedAxis <= 0) return s.SplitterDistance;
 
-        double ratio = (double)s.SplitterDistance / savedAxis;
+        Double ratio = (Double)s.SplitterDistance / savedAxis;
         _splitterDistanceRatio = Math.Max(0d, Math.Min(1d, ratio));
 
         return GetPreferredDistanceFromRatio();
@@ -302,7 +304,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Handles text changes in the editor; marks the document dirty and restarts the live-preview debounce timer.
     /// </summary>
-    private void _editorTextBox_TextChanged(object sender, EventArgs e)
+    private void _editorTextBox_TextChanged(Object sender, EventArgs e)
     {
         if (!_suppressDirtyFlag)
         {
@@ -319,7 +321,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Handles the debounce timer tick; stops the timer and triggers a preview render.
     /// </summary>
-    private void _previewTimer_Tick(object sender, EventArgs e)
+    private void _previewTimer_Tick(Object sender, EventArgs e)
     {
         _previewTimer.Stop();
         DoRenderPreview();
@@ -328,31 +330,36 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Handles key up in the editor; syncs preview scroll and active line to the caret.
     /// </summary>
-    private void _editorTextBox_KeyUp(object sender, KeyEventArgs e) =>
+    private void _editorTextBox_KeyUp(Object sender, KeyEventArgs e) =>
         SyncPreviewToCaretLine(GetEditorCaretLine());
 
     /// <summary>
     /// Handles mouse up in the editor; syncs preview when the caret moves via clicking or selection.
     /// </summary>
-    private void _editorTextBox_MouseUp(object sender, MouseEventArgs e) =>
+    private void _editorTextBox_MouseUp(Object sender, MouseEventArgs e) =>
         SyncPreviewToCaretLine(GetEditorCaretLine());
 
     /// <summary>
     /// Handles WebView2 navigation completion; applies any pending scroll-to-line request.
     /// </summary>
-    private void _previewBrowser_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+    private void _previewBrowser_NavigationCompleted(Object sender, CoreWebView2NavigationCompletedEventArgs e)
     {
-        if (_pendingPreviewScrollLine < 0) return;
+        if (_pendingPreviewScrollLine >= 0)
+        {
+            Int32 line = _pendingPreviewScrollLine;
+            _pendingPreviewScrollLine = -1;
+            BeginInvokeWhenHandleReady(() => SyncPreviewToCaretLine(line));
+        }
 
-        int line = _pendingPreviewScrollLine;
-        _pendingPreviewScrollLine = -1;
-        BeginInvokeWhenHandleReady(() => SyncPreviewToCaretLine(line));
+        TryPrintPreviewIfPending();
+        _ = TryExportPdfIfPendingAsync();
     }
 
     /// <summary>
     /// Handles WebView2 initialization completion; enables preview rendering once the embedded browser is ready.
     /// </summary>
-    private void _previewBrowser_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
+    private void _previewBrowser_CoreWebView2InitializationCompleted(Object sender,
+        CoreWebView2InitializationCompletedEventArgs e)
     {
         if (!e.IsSuccess) return;
 
@@ -364,15 +371,15 @@ internal sealed partial class MarkupEditor : Form
     /// Returns the zero-based logical line index of the caret (newline-delimited), matching <see cref="MarkupParser"/> line numbering.
     /// </summary>
     /// <returns>The current caret line.</returns>
-    private int GetEditorCaretLine()
+    private Int32 GetEditorCaretLine()
     {
-        string text = _editorTextBox.Text;
-        int caret = Math.Min(Math.Max(0, _editorTextBox.SelectionStart), text.Length);
-        int line = 0;
+        String text = _editorTextBox.Text;
+        Int32 caret = Math.Min(Math.Max(0, _editorTextBox.SelectionStart), text.Length);
+        Int32 line = 0;
 
-        for (int i = 0; i < caret; i++)
+        for (Int32 i = 0; i < caret; i++)
         {
-            char c = text[i];
+            Char c = text[i];
 
             switch (c)
             {
@@ -382,12 +389,12 @@ internal sealed partial class MarkupEditor : Form
                     break;
 
                 case '\r':
-                {
-                    line++;
-                    if (i + 1 < text.Length && text[i + 1] == '\n') i++;
+                    {
+                        line++;
+                        if (i + 1 < text.Length && text[i + 1] == '\n') i++;
 
-                    break;
-                }
+                        break;
+                    }
             }
         }
 
@@ -399,14 +406,14 @@ internal sealed partial class MarkupEditor : Form
     /// Both scroll and highlight are handled by the injected <c>MarkupSetActiveLine</c> JavaScript function.
     /// </summary>
     /// <param name="editorLineIndex">Zero-based source line index.</param>
-    private void SyncPreviewToCaretLine(int editorLineIndex) =>
+    private void SyncPreviewToCaretLine(Int32 editorLineIndex) =>
         TryInvokePreviewActiveLineHighlight(editorLineIndex);
 
     /// <summary>
     /// Calls the preview script to scroll to and highlight the block for the given source line.
     /// </summary>
     /// <param name="editorLineIndex">Zero-based source line index.</param>
-    private void TryInvokePreviewActiveLineHighlight(int editorLineIndex)
+    private void TryInvokePreviewActiveLineHighlight(Int32 editorLineIndex)
     {
         if (!_previewReady || editorLineIndex < 0) return;
 
@@ -429,24 +436,25 @@ internal sealed partial class MarkupEditor : Form
     /// Any previous watcher is stopped first.
     /// </summary>
     /// <param name="filePath">Absolute path of the file to watch.</param>
-    private void StartWatchingFile(string filePath)
+    private void StartWatchingFile(String filePath)
     {
         StopWatchingFile();
 
-        if (string.IsNullOrWhiteSpace(filePath)) return;
+        if (String.IsNullOrWhiteSpace(filePath)) return;
 
-        string directory = Path.GetDirectoryName(filePath);
-        string fileName = Path.GetFileName(filePath);
+        String directory = Path.GetDirectoryName(filePath);
+        String fileName = Path.GetFileName(filePath);
 
-        if (string.IsNullOrEmpty(directory) || string.IsNullOrEmpty(fileName)) return;
+        if (String.IsNullOrEmpty(directory) || String.IsNullOrEmpty(fileName)) return;
 
         _externalChangePending = false;
 
-        _fileWatcher = new FileSystemWatcher(directory, fileName)
-        {
-            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Size,
-            EnableRaisingEvents = true
-        };
+        _fileWatcher =
+            new FileSystemWatcher(directory, fileName)
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.Size,
+                EnableRaisingEvents = true
+            };
 
         _fileWatcher.Changed += _fileWatcher_ExternalChange;
         _fileWatcher.Deleted += _fileWatcher_ExternalChange;
@@ -472,7 +480,7 @@ internal sealed partial class MarkupEditor : Form
     /// Handles file-system change events raised by the watcher on a background thread;
     /// marshals a single alert to the UI thread, but only shows it when the form is focused.
     /// </summary>
-    private void _fileWatcher_ExternalChange(object sender, FileSystemEventArgs e)
+    private void _fileWatcher_ExternalChange(Object sender, FileSystemEventArgs e)
     {
         if (DateTime.UtcNow < _ignoreFileWatcherEventsUntilUtc) return;
 
@@ -499,7 +507,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Handles the <see cref="Form.Activated"/> event; shows any deferred external-change alert.
     /// </summary>
-    private void MarkupEditor_Activated(object sender, EventArgs e)
+    private void MarkupEditor_Activated(Object sender, EventArgs e)
     {
         if (_externalChangePending)
             OnFileChangedExternally();
@@ -513,16 +521,18 @@ internal sealed partial class MarkupEditor : Form
     {
         _externalChangePending = false;
 
-        bool fileExists = !string.IsNullOrWhiteSpace(_currentFilePath) && File.Exists(_currentFilePath);
+        Boolean fileExists = !String.IsNullOrWhiteSpace(_currentFilePath) && File.Exists(_currentFilePath);
 
-        string message = fileExists
-            ? $"The file has been modified by another process.\r\n\r\n{_currentFilePath}\r\n\r\nDo you want to reload it?"
-            : $"The file has been moved or deleted by another process.\r\n\r\n{_currentFilePath}";
+        String message =
+            fileExists
+                ? $@"The file has been modified by another process.\r\n\r\n{_currentFilePath}\r\n\r\nDo you want to reload it?"
+                : $@"The file has been moved or deleted by another process.\r\n\r\n{_currentFilePath}";
 
         if (fileExists)
         {
-            DialogResult result = MessageBox.Show(this, message, "File Changed Externally",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            DialogResult result =
+                MessageBox.Show(this, message, @"File Changed Externally",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
             if (result == DialogResult.Yes)
                 TryOpenFileAtPath(_currentFilePath);
@@ -531,7 +541,7 @@ internal sealed partial class MarkupEditor : Form
         {
             StopWatchingFile();
 
-            MessageBox.Show(this, message, "File Changed Externally",
+            MessageBox.Show(this, message, @"File Changed Externally",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
@@ -543,7 +553,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Handles the <see cref="Form.FormClosing"/> event; prompts to save unsaved changes, then persists user settings.
     /// </summary>
-    private void MarkupEditor_FormClosing(object sender, FormClosingEventArgs e)
+    private void MarkupEditor_FormClosing(Object sender, FormClosingEventArgs e)
     {
         if (!PromptToSaveChanges())
         {
@@ -571,17 +581,19 @@ internal sealed partial class MarkupEditor : Form
         _editorTextBox.WordWrap = s.WordWrap;
         _editorTextBox.ScrollBars = _editorTextBox.WordWrap ? ScrollBars.Vertical : ScrollBars.Both;
 
-        float fontSize = s.EditorFontSize;
+        Single fontSize = s.EditorFontSize;
         fontSize = Math.Max(8f, Math.Min(28f, fontSize));
         _editorTextBox.Font = new Font(_editorTextBox.Font.FontFamily, fontSize, _editorTextBox.Font.Style);
 
-        bool horizontalSplit = s.HorizontalSplit;
+        Boolean horizontalSplit = s.HorizontalSplit;
         _mainSplit.Orientation = horizontalSplit ? Orientation.Horizontal : Orientation.Vertical;
 
         _lineNumberPanel.Visible = s.ShowLineNumbers;
 
         _allowRawHtml = s.AllowRawHtml;
-        _selfSaveWatcherSuppressMilliseconds = ClampSelfSaveWatcherSuppressMilliseconds(s.SelfSaveWatcherSuppressMilliseconds);
+
+        _selfSaveWatcherSuppressMilliseconds =
+            ClampSelfSaveWatcherSuppressMilliseconds(s.SelfSaveWatcherSuppressMilliseconds);
     }
 
     /// <summary>
@@ -624,10 +636,12 @@ internal sealed partial class MarkupEditor : Form
         s.HorizontalSplit = _mainSplit.Orientation == Orientation.Horizontal;
         s.ShowLineNumbers = _lineNumberPanel.Visible;
         s.AllowRawHtml = _allowRawHtml;
+
         s.SelfSaveWatcherSuppressMilliseconds =
             ClampSelfSaveWatcherSuppressMilliseconds(_selfSaveWatcherSuppressMilliseconds);
+
         s.HasSavedWindowLayout = true;
-        s.MainWindowState = (int)WindowState;
+        s.MainWindowState = (Int32)WindowState;
 
         s.MainWindowBounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
         s.SplitterDistance = GetSplitterDistanceForPersistedWindowBounds(s.MainWindowBounds);
@@ -641,22 +655,23 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     /// <param name="persistedBounds">The window bounds that will be written to settings.</param>
     /// <returns>A splitter distance aligned to <paramref name="persistedBounds"/>.</returns>
-    private int GetSplitterDistanceForPersistedWindowBounds(Rectangle persistedBounds)
+    private Int32 GetSplitterDistanceForPersistedWindowBounds(Rectangle persistedBounds)
     {
-        int persistedAxis = _mainSplit.Orientation == Orientation.Horizontal
-            ? persistedBounds.Height
-            : persistedBounds.Width;
+        Int32 persistedAxis =
+            _mainSplit.Orientation == Orientation.Horizontal
+                ? persistedBounds.Height
+                : persistedBounds.Width;
 
         if (persistedAxis <= 0) return _mainSplit.SplitterDistance;
 
-        int currentAxis = GetSplitAxisLength();
+        Int32 currentAxis = GetSplitAxisLength();
 
         if (currentAxis <= 0) return _mainSplit.SplitterDistance;
 
-        double ratio = (double)_mainSplit.SplitterDistance / currentAxis;
+        Double ratio = (Double)_mainSplit.SplitterDistance / currentAxis;
         ratio = Math.Max(0d, Math.Min(1d, ratio));
 
-        return (int)Math.Round(persistedAxis * ratio);
+        return (Int32)Math.Round(persistedAxis * ratio);
     }
 
     /// <summary>
@@ -664,7 +679,7 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     /// <param name="milliseconds">Requested suppression duration in milliseconds.</param>
     /// <returns>A bounded suppression duration.</returns>
-    private static int ClampSelfSaveWatcherSuppressMilliseconds(int milliseconds) =>
+    private static Int32 ClampSelfSaveWatcherSuppressMilliseconds(Int32 milliseconds) =>
         Math.Max(SelfSaveWatcherSuppressMillisecondsMin,
             Math.Min(SelfSaveWatcherSuppressMillisecondsMax, milliseconds));
 
@@ -673,7 +688,7 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     /// <param name="raw">The persisted enum underlying value.</param>
     /// <returns>A valid window state for startup (never minimized).</returns>
-    private static FormWindowState ToFormWindowState(int raw)
+    private static FormWindowState ToFormWindowState(Int32 raw)
     {
         if (raw is < 0 or > 2) return FormWindowState.Normal;
 
@@ -687,9 +702,9 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     /// <param name="bounds">The proposed window bounds.</param>
     /// <returns><see langword="true"/> if the window can be placed here without being fully off-screen.</returns>
-    private static bool IsRecoverableOnScreen(Rectangle bounds)
+    private static Boolean IsRecoverableOnScreen(Rectangle bounds)
     {
-        const int minVisible = 80;
+        const Int32 minVisible = 80;
 
         return Screen.AllScreens.Select(screen => Rectangle.Intersect(screen.WorkingArea, bounds))
             .Any(visible => visible is { Width: >= minVisible, Height: >= minVisible });
@@ -706,20 +721,23 @@ internal sealed partial class MarkupEditor : Form
     {
         _suppressDirtyFlag = true;
 
-        _editorTextBox.Text = "# Welcome to Markup Editor\r\n\r\n" +
-                              "This editor uses **CommonMark**-style Markdown with **GFM-style** extras " +
-                              "(tables, task lists, strikethrough, autolinks, footnotes). Raw `<html>` in the " +
-                              "source is shown as text in the preview.\r\n\r\n" +
-                              "## Try it\r\n\r\n" +
-                              "| Feature | Example |\r\n" +
-                              "|---------|---------|\r\n" +
-                              "| Task | - [ ] Todo |\r\n\r\n" +
-                              "```\r\nfenced code block\r\n```\r\n\r\n" +
-                              "> Block quote\r\n\r\n" +
-                              "[Link](https://example.com)\r\n\r\n" +
-                              "~~strikethrough~~\r\n\r\n" +
-                              "Footnote[^1]\r\n\r\n" +
-                              "[^1]: Footnote text.\r\n";
+        _editorTextBox.Text =
+            // ReSharper disable LocalizableElement
+            "# Welcome to Markup Editor\r\n\r\n" +
+            "This editor uses **CommonMark**-style Markdown with **GFM-style** extras " +
+            "(tables, task lists, strikethrough, autolinks, footnotes). Raw `<html>` in the " +
+            "source is shown as text in the preview.\r\n\r\n" +
+            "## Try it\r\n\r\n" +
+            "| Feature | Example |\r\n" +
+            "|---------|---------|\r\n" +
+            "| Task | - [ ] Todo |\r\n\r\n" +
+            "```\r\nfenced code block\r\n```\r\n\r\n" +
+            "> Block quote\r\n\r\n" +
+            "[Link](https://example.com)\r\n\r\n" +
+            "~~strikethrough~~\r\n\r\n" +
+            "Footnote[^1]\r\n\r\n" +
+            "[^1]: Footnote text.\r\n";
+        // ReSharper restore LocalizableElement
 
         _suppressDirtyFlag = false;
         _isDirty = false;
@@ -728,7 +746,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Creates a new empty document, prompting to save unsaved changes first.
     /// </summary>
-    private void fileNew_Click(object sender, EventArgs args)
+    private void fileNew_Click(Object sender, EventArgs args)
     {
         if (!PromptToSaveChanges()) return;
 
@@ -746,7 +764,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Opens a markup file from disk, prompting to save unsaved changes first.
     /// </summary>
-    private void fileOpen_Click(object sender, EventArgs args)
+    private void fileOpen_Click(Object sender, EventArgs args)
     {
         if (!PromptToSaveChanges()) return;
 
@@ -763,13 +781,13 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Reloads the current file from disk, warning before discarding unsaved editor changes.
     /// </summary>
-    private void fileReload_Click(object sender, EventArgs args)
+    private void fileReload_Click(Object sender, EventArgs args)
     {
-        if (string.IsNullOrWhiteSpace(_currentFilePath))
+        if (String.IsNullOrWhiteSpace(_currentFilePath))
         {
             MessageBox.Show(this,
-                "The current document has not been saved yet, so there is no file to reload.",
-                "Reload",
+                @"The current document has not been saved yet, so there is no file to reload.",
+                @"Reload",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
 
@@ -785,15 +803,16 @@ internal sealed partial class MarkupEditor : Form
     /// Warns when reloading would discard unsaved changes in the current editor buffer.
     /// </summary>
     /// <returns><see langword="true"/> when reload can continue; otherwise <see langword="false"/>.</returns>
-    private bool PromptToDiscardChangesForReload()
+    private Boolean PromptToDiscardChangesForReload()
     {
         if (!_isDirty) return true;
 
-        DialogResult result = MessageBox.Show(this,
-            "Reloading will discard unsaved changes in this document. Continue?",
-            "Unsaved Changes",
-            MessageBoxButtons.YesNo,
-            MessageBoxIcon.Warning);
+        DialogResult result =
+            MessageBox.Show(this,
+                @"Reloading will discard unsaved changes in this document. Continue?",
+                @"Unsaved Changes",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
 
         return result == DialogResult.Yes;
     }
@@ -801,16 +820,16 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Rebuilds the Recent Documents submenu before it is shown.
     /// </summary>
-    private void fileRecentDocuments_DropDownOpening(object sender, EventArgs e) => RefreshRecentDocumentsMenu();
+    private void fileRecentDocuments_DropDownOpening(Object sender, EventArgs e) => RefreshRecentDocumentsMenu();
 
     /// <summary>
     /// Opens a path chosen from the Recent Documents list.
     /// </summary>
-    private void fileRecentDocumentsEntry_Click(object sender, EventArgs e)
+    private void fileRecentDocumentsEntry_Click(Object sender, EventArgs e)
     {
         if (sender is not ToolStripMenuItem item) return;
 
-        if (item.Tag is not string path || string.IsNullOrWhiteSpace(path)) return;
+        if (item.Tag is not String path || String.IsNullOrWhiteSpace(path)) return;
 
         if (!PromptToSaveChanges()) return;
 
@@ -823,7 +842,7 @@ internal sealed partial class MarkupEditor : Form
     private void RefreshRecentDocumentsMenu()
     {
         fileRecentDocuments.DropDownItems.Clear();
-        List<string> paths = ParseRecentDocumentsFromSettings();
+        List<String> paths = ParseRecentDocumentsFromSettings();
 
         if (paths.Count == 0)
         {
@@ -834,7 +853,7 @@ internal sealed partial class MarkupEditor : Form
             return;
         }
 
-        foreach (string fullPath in paths)
+        foreach (String fullPath in paths)
         {
             ToolStripMenuItem entry = new(FormatRecentMenuCaption(fullPath));
             entry.Tag = fullPath;
@@ -849,14 +868,14 @@ internal sealed partial class MarkupEditor : Form
     /// Returns stored recent document paths, most recent first.
     /// </summary>
     /// <returns>A mutable list of full paths.</returns>
-    private static List<string> ParseRecentDocumentsFromSettings()
+    private static List<String> ParseRecentDocumentsFromSettings()
     {
-        string raw = Settings.Default.RecentDocuments ?? string.Empty;
-        List<string> list = new();
+        String raw = Settings.Default.RecentDocuments ?? String.Empty;
+        List<String> list = [];
 
-        if (string.IsNullOrWhiteSpace(raw)) return list;
+        if (String.IsNullOrWhiteSpace(raw)) return list;
 
-        string[] parts = raw.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        String[] parts = raw.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
         list.AddRange(parts.Select(part => part.Trim()).Where(trimmed => trimmed.Length > 0));
 
         return list;
@@ -865,17 +884,17 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Persists the recent-document list as newline-separated full paths.
     /// </summary>
-    private static string SerializeRecentDocumentsPaths(IReadOnlyList<string> paths) => string.Join("\n", paths);
+    private static String SerializeRecentDocumentsPaths(IReadOnlyList<String> paths) => String.Join("\n", paths);
 
     /// <summary>
     /// Inserts a path at the front of the recent list and trims it to the configured capacity.
     /// </summary>
     /// <param name="fullPath">The path that was opened successfully.</param>
-    private void RememberRecentDocument(string fullPath)
+    private void RememberRecentDocument(String fullPath)
     {
-        if (string.IsNullOrWhiteSpace(fullPath)) return;
+        if (String.IsNullOrWhiteSpace(fullPath)) return;
 
-        string normalized;
+        String normalized;
 
         try
         {
@@ -886,11 +905,11 @@ internal sealed partial class MarkupEditor : Form
             return;
         }
 
-        List<string> paths = ParseRecentDocumentsFromSettings();
+        List<String> paths = ParseRecentDocumentsFromSettings();
 
-        for (int i = paths.Count - 1; i >= 0; i--)
+        for (Int32 i = paths.Count - 1; i >= 0; i--)
         {
-            if (string.Equals(paths[i], normalized, StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(paths[i], normalized, StringComparison.OrdinalIgnoreCase))
                 paths.RemoveAt(i);
         }
 
@@ -906,11 +925,11 @@ internal sealed partial class MarkupEditor : Form
     /// Removes a path from the recent list (for example when it no longer exists).
     /// </summary>
     /// <param name="filePath">The path to remove.</param>
-    private void RemoveRecentDocumentFromSettings(string filePath)
+    private void RemoveRecentDocumentFromSettings(String filePath)
     {
-        if (string.IsNullOrWhiteSpace(filePath)) return;
+        if (String.IsNullOrWhiteSpace(filePath)) return;
 
-        string normalized;
+        String normalized;
 
         try
         {
@@ -921,12 +940,12 @@ internal sealed partial class MarkupEditor : Form
             return;
         }
 
-        List<string> paths = ParseRecentDocumentsFromSettings();
-        bool changed = false;
+        List<String> paths = ParseRecentDocumentsFromSettings();
+        Boolean changed = false;
 
-        for (int i = paths.Count - 1; i >= 0; i--)
+        for (Int32 i = paths.Count - 1; i >= 0; i--)
         {
-            if (!string.Equals(paths[i], normalized, StringComparison.OrdinalIgnoreCase)) continue;
+            if (!String.Equals(paths[i], normalized, StringComparison.OrdinalIgnoreCase)) continue;
 
             paths.RemoveAt(i);
             changed = true;
@@ -942,9 +961,9 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Shortens a full path for display on a menu item.
     /// </summary>
-    private static string FormatRecentMenuCaption(string fullPath)
+    private static String FormatRecentMenuCaption(String fullPath)
     {
-        const int maxDisplay = 72;
+        const Int32 maxDisplay = 72;
 
         if (fullPath.Length <= maxDisplay) return fullPath;
 
@@ -956,25 +975,26 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     /// <param name="filePath">The path to the file to open.</param>
     /// <returns><see langword="true"/> if the file was loaded; otherwise <see langword="false"/>.</returns>
-    private bool TryOpenFileAtPath(string filePath)
+    private Boolean TryOpenFileAtPath(String filePath)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(filePath)) return false;
+            if (String.IsNullOrWhiteSpace(filePath)) return false;
 
-            string fullPath = Path.GetFullPath(filePath);
+            String fullPath = Path.GetFullPath(filePath);
 
             if (!File.Exists(fullPath))
             {
                 RemoveRecentDocumentFromSettings(fullPath);
 
-                MessageBox.Show(this, $"The file was not found.\r\n\r\n{fullPath}", "Open Failed", MessageBoxButtons.OK,
+                MessageBox.Show(this, $@"The file was not found.\r\n\r\n{fullPath}", @"Open Failed",
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
 
                 return false;
             }
 
-            string contents = File.ReadAllText(fullPath, Encoding.UTF8);
+            String contents = File.ReadAllText(fullPath, Encoding.UTF8);
             _suppressDirtyFlag = true;
             _editorTextBox.Text = contents;
             _suppressDirtyFlag = false;
@@ -990,7 +1010,7 @@ internal sealed partial class MarkupEditor : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, $"Could not open file.\r\n\r\n{ex.Message}", "Open Failed", MessageBoxButtons.OK,
+            MessageBox.Show(this, $@"Could not open file.\r\n\r\n{ex.Message}", @"Open Failed", MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
 
             return false;
@@ -1000,48 +1020,113 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Saves the document, prompting for a path if it has not been saved before.
     /// </summary>
-    private void fileSave_Click(object sender, EventArgs args) => DoSaveDocument();
+    private void fileSave_Click(Object sender, EventArgs args) => DoSaveDocument();
 
     /// <summary>
     /// Saves the document to a new path chosen by the user.
     /// </summary>
-    private void fileSaveAs_Click(object sender, EventArgs args)
+    private void fileSaveAs_Click(Object sender, EventArgs args)
     {
-        string originalPath = _currentFilePath;
+        String originalPath = _currentFilePath;
         _currentFilePath = null;
 
         fileSave_Click(sender, args);
 
-        if (!string.IsNullOrWhiteSpace(_currentFilePath)) return;
+        if (!String.IsNullOrWhiteSpace(_currentFilePath)) return;
 
         _currentFilePath = originalPath;
     }
 
     /// <summary>
+    /// Prints the rendered preview using the browser print dialog.
+    /// </summary>
+    private void filePrint_Click(Object sender, EventArgs args)
+    {
+        _pendingPrintAfterRender = true;
+
+        if (_previewReady)
+            DoRenderPreview();
+        else
+            _ = _previewBrowser.EnsureCoreWebView2Async(null);
+    }
+
+    /// <summary>
+    /// Exports the rendered preview to a PDF file.
+    /// </summary>
+    private void fileExportPdf_Click(Object sender, EventArgs args)
+    {
+        using SaveFileDialog dialog = new();
+
+        dialog.Filter = @"PDF Files|*.pdf|All Files|*.*";
+        dialog.Title = @"Export as PDF";
+        String baseName = Path.GetFileNameWithoutExtension(_currentFilePath ?? "document");
+        dialog.FileName = baseName + ".pdf";
+
+        if (dialog.ShowDialog(this) != DialogResult.OK) return;
+
+        _pendingPdfExportPath = dialog.FileName;
+
+        if (_previewReady)
+            DoRenderPreview();
+        else
+            _ = _previewBrowser.EnsureCoreWebView2Async(null);
+    }
+
+    /// <summary>
+    /// Exports the current document as a standalone LaTeX file.
+    /// </summary>
+    private void fileExportTex_Click(Object sender, EventArgs args)
+    {
+        using SaveFileDialog dialog = new();
+
+        dialog.Filter = @"TeX Files|*.tex|All Files|*.*";
+        dialog.Title = @"Export as TeX";
+        String baseName = Path.GetFileNameWithoutExtension(_currentFilePath ?? "document");
+        dialog.FileName = baseName + ".tex";
+
+        if (dialog.ShowDialog(this) != DialogResult.OK) return;
+
+        String tex = MarkupParser.ConvertMarkupToLatexDocument(_editorTextBox.Text);
+
+        try
+        {
+            File.WriteAllText(dialog.FileName, tex, Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this,
+                $@"Could not export file.\r\n\r\n{ex.Message}",
+                @"Export Failed",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+    }
+
+    /// <summary>
     /// Handles Exit; closes the form so <see cref="MarkupEditor_FormClosing"/> runs the save prompt and persists settings once.
     /// </summary>
-    private void fileExit_Click(object sender, EventArgs args) => Close();
+    private void fileExit_Click(Object sender, EventArgs args) => Close();
 
     #endregion
 
     #region Edit menu
 
     /// <summary>Cuts the selected text to the clipboard.</summary>
-    private void editCut_Click(object sender, EventArgs args) => _editorTextBox.Cut();
+    private void editCut_Click(Object sender, EventArgs args) => _editorTextBox.Cut();
 
     /// <summary>Copies the selected text to the clipboard.</summary>
-    private void editCopy_Click(object sender, EventArgs args) => _editorTextBox.Copy();
+    private void editCopy_Click(Object sender, EventArgs args) => _editorTextBox.Copy();
 
     /// <summary>Pastes clipboard text at the current cursor position.</summary>
-    private void editPaste_Click(object sender, EventArgs args) => _editorTextBox.Paste();
+    private void editPaste_Click(Object sender, EventArgs args) => _editorTextBox.Paste();
 
     /// <summary>Selects all text in the editor.</summary>
-    private void editSelectAll_Click(object sender, EventArgs args) => _editorTextBox.SelectAll();
+    private void editSelectAll_Click(Object sender, EventArgs args) => _editorTextBox.SelectAll();
 
     /// <summary>
     /// Opens the find/replace dialog with focus on the Find field.
     /// </summary>
-    private void editFind_Click(object sender, EventArgs args)
+    private void editFind_Click(Object sender, EventArgs args)
     {
         using FindReplaceDialog dialog = new(_editorTextBox, initialFocusOnReplace: false);
 
@@ -1051,7 +1136,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Opens the find/replace dialog with focus on the Replace field.
     /// </summary>
-    private void editReplace_Click(object sender, EventArgs args)
+    private void editReplace_Click(Object sender, EventArgs args)
     {
         using FindReplaceDialog dialog = new(_editorTextBox, initialFocusOnReplace: true);
 
@@ -1059,13 +1144,13 @@ internal sealed partial class MarkupEditor : Form
     }
 
     /// <summary>Undoes the last edit operation if one is available.</summary>
-    private void editUndo_Click(object sender, EventArgs args)
+    private void editUndo_Click(Object sender, EventArgs args)
     {
         if (_editorTextBox.CanUndo) _editorTextBox.Undo();
     }
 
     /// <summary>Redoes the last undone edit via the Win32 EM_REDO message.</summary>
-    private void editRedo_Click(object sender, EventArgs args) =>
+    private void editRedo_Click(Object sender, EventArgs args) =>
         SendMessage(_editorTextBox.Handle, EmRedo, IntPtr.Zero, IntPtr.Zero);
 
     #endregion
@@ -1073,20 +1158,21 @@ internal sealed partial class MarkupEditor : Form
     #region Tools menu and editor appearance
 
     /// <summary>Manually triggers a preview render from the Tools menu (Render Preview).</summary>
-    private void toolsRender_Click(object sender, EventArgs args) => DoRenderPreview();
+    private void toolsRender_Click(Object sender, EventArgs args) => DoRenderPreview();
 
     /// <summary>
     /// Opens the Settings dialog; applies accepted changes immediately.
     /// </summary>
-    private void toolsSettings_Click(object sender, EventArgs args)
+    private void toolsSettings_Click(Object sender, EventArgs args)
     {
-        using SettingsDialog dialog = new(
-            _livePreviewEnabled,
-            _editorTextBox.WordWrap,
-            _mainSplit.Orientation == Orientation.Horizontal,
-            _lineNumberPanel.Visible,
-            _allowRawHtml,
-            _editorTextBox.Font.Size);
+        using SettingsDialog dialog =
+            new(
+                _livePreviewEnabled,
+                _editorTextBox.WordWrap,
+                _mainSplit.Orientation == Orientation.Horizontal,
+                _lineNumberPanel.Visible,
+                _allowRawHtml,
+                _editorTextBox.Font.Size);
 
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
 
@@ -1099,7 +1185,7 @@ internal sealed partial class MarkupEditor : Form
     /// <param name="dialog">The closed dialog whose property values are authoritative.</param>
     private void ApplySettingsFromDialog(SettingsDialog dialog)
     {
-        bool livePreviewChanged = _livePreviewEnabled != dialog.LivePreview;
+        Boolean livePreviewChanged = _livePreviewEnabled != dialog.LivePreview;
         _livePreviewEnabled = dialog.LivePreview;
 
         if (livePreviewChanged)
@@ -1114,17 +1200,17 @@ internal sealed partial class MarkupEditor : Form
             _editorTextBox.ScrollBars = _editorTextBox.WordWrap ? ScrollBars.Vertical : ScrollBars.Both;
         }
 
-        bool newHorizontal = dialog.HorizontalSplit;
+        Boolean newHorizontal = dialog.HorizontalSplit;
 
         if (_mainSplit.Orientation == Orientation.Horizontal != newHorizontal)
             ApplySplitOrientation(newHorizontal);
 
         _lineNumberPanel.Visible = dialog.ShowLineNumbers;
 
-        bool allowRawHtmlChanged = _allowRawHtml != dialog.AllowRawHtml;
+        Boolean allowRawHtmlChanged = _allowRawHtml != dialog.AllowRawHtml;
         _allowRawHtml = dialog.AllowRawHtml;
 
-        float newFontSize = dialog.FontSize;
+        Single newFontSize = dialog.FontSize;
 
         if (Math.Abs(newFontSize - _editorTextBox.Font.Size) > 0.01f)
             _editorTextBox.Font = new Font(_editorTextBox.Font.FontFamily, newFontSize, _editorTextBox.Font.Style);
@@ -1139,7 +1225,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Displays a dialog listing the supported markup syntax.
     /// </summary>
-    private void helpSyntax_Click(object sender, EventArgs args) =>
+    private void helpSyntax_Click(Object sender, EventArgs args) =>
         MessageBox.Show(this,
             """
                 Supported markup (CommonMark + GFM-style extensions via Markdig):
@@ -1157,17 +1243,17 @@ internal sealed partial class MarkupEditor : Form
 
                 See https://spec.commonmark.org/ and GitHub Flavored Markdown for full rules.
                 """.Replace("\n", "\r\n"),
-            "Supported Markup",
+            @"Supported Markup",
             MessageBoxButtons.OK,
             MessageBoxIcon.Information);
 
     /// <summary>
     /// Displays the About dialog.
     /// </summary>
-    private void helpAbout_Click(object sender, EventArgs args) =>
+    private void helpAbout_Click(Object sender, EventArgs args) =>
         MessageBox.Show(this,
-            "MarkupEditor\r\n\r\nSimple markup editor with live preview.\r\n",
-            "About MarkupEditor",
+            @"MarkupEditor\r\n\r\nSimple markup editor with live preview.\r\n",
+            @"About MarkupEditor",
             MessageBoxButtons.OK,
             MessageBoxIcon.Information);
 
@@ -1182,15 +1268,16 @@ internal sealed partial class MarkupEditor : Form
     /// <see langword="true"/> if the caller may proceed; <see langword="false"/> if the user cancelled or chose
     /// <b>Yes</b> but the document could not be saved.
     /// </returns>
-    private bool PromptToSaveChanges()
+    private Boolean PromptToSaveChanges()
     {
         if (!_isDirty) return true;
 
-        DialogResult result = MessageBox.Show(this,
-            "You have unsaved changes. Save before continuing?",
-            "Unsaved Changes",
-            MessageBoxButtons.YesNoCancel,
-            MessageBoxIcon.Warning);
+        DialogResult result =
+            MessageBox.Show(this,
+                @"You have unsaved changes. Save before continuing?",
+                @"Unsaved Changes",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Warning);
 
         // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
         switch (result)
@@ -1216,14 +1303,14 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     private void DoSaveDocument()
     {
-        string previousPath = _currentFilePath;
+        String previousPath = _currentFilePath;
 
-        if (string.IsNullOrWhiteSpace(_currentFilePath))
+        if (String.IsNullOrWhiteSpace(_currentFilePath))
         {
             using SaveFileDialog dialog = new();
 
-            dialog.Filter = "Markdown|*.md|Text|*.txt|All Files|*.*";
-            dialog.Title = "Save Markup File";
+            dialog.Filter = @"Markdown|*.md|Text|*.txt|All Files|*.*";
+            dialog.Title = @"Save Markup File";
             dialog.FileName = "document.md";
 
             if (dialog.ShowDialog(this) != DialogResult.OK) return;
@@ -1233,11 +1320,14 @@ internal sealed partial class MarkupEditor : Form
 
         try
         {
-            string fullPath = Path.GetFullPath(_currentFilePath);
+            String fullPath = Path.GetFullPath(_currentFilePath);
             StopWatchingFile();
             _externalChangePending = false;
-            _ignoreFileWatcherEventsUntilUtc = DateTime.UtcNow +
-                                               TimeSpan.FromMilliseconds(_selfSaveWatcherSuppressMilliseconds);
+
+            _ignoreFileWatcherEventsUntilUtc =
+                DateTime.UtcNow +
+                TimeSpan.FromMilliseconds(_selfSaveWatcherSuppressMilliseconds);
+
             File.WriteAllText(fullPath, _editorTextBox.Text, Encoding.UTF8);
             _currentFilePath = fullPath;
             _isDirty = false;
@@ -1249,10 +1339,10 @@ internal sealed partial class MarkupEditor : Form
         {
             _currentFilePath = previousPath;
 
-            if (!string.IsNullOrWhiteSpace(previousPath))
+            if (!String.IsNullOrWhiteSpace(previousPath))
                 StartWatchingFile(previousPath);
 
-            MessageBox.Show(this, $"Could not save file.\r\n\r\n{ex.Message}", "Save Failed", MessageBoxButtons.OK,
+            MessageBox.Show(this, $@"Could not save file.\r\n\r\n{ex.Message}", @"Save Failed", MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
     }
@@ -1260,18 +1350,19 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Exports the current document as a standalone HTML file.
     /// </summary>
-    private void fileExportHtml_Click(object sender, EventArgs args)
+    private void fileExportHtml_Click(Object sender, EventArgs args)
     {
         using SaveFileDialog dialog = new();
 
-        dialog.Filter = "HTML Files|*.html;*.htm|All Files|*.*";
-        dialog.Title = "Export as HTML";
-        string baseName = Path.GetFileNameWithoutExtension(_currentFilePath ?? "document");
+        dialog.Filter = @"HTML Files|*.html;*.htm|All Files|*.*";
+        dialog.Title = @"Export as HTML";
+        String baseName = Path.GetFileNameWithoutExtension(_currentFilePath ?? "document");
         dialog.FileName = baseName + ".html";
 
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
 
-        string html = MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml));
+        String html =
+            MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml));
 
         try
         {
@@ -1279,8 +1370,85 @@ internal sealed partial class MarkupEditor : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, $"Could not export file.\r\n\r\n{ex.Message}", "Export Failed",
+            MessageBox.Show(this, $@"Could not export file.\r\n\r\n{ex.Message}", @"Export Failed",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    /// <summary>
+    /// Prints the preview when a render-triggered print request is waiting.
+    /// </summary>
+    private void TryPrintPreviewIfPending()
+    {
+        if (!_pendingPrintAfterRender) return;
+
+        _pendingPrintAfterRender = false;
+
+        if (!_previewReady || _previewBrowser.CoreWebView2 == null)
+        {
+            MessageBox.Show(this,
+                @"The preview is not ready to print yet.",
+                @"Print",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
+            return;
+        }
+
+        try
+        {
+            _ = _previewBrowser.ExecuteScriptAsync("window.print();");
+        }
+        catch (InvalidOperationException)
+        {
+            MessageBox.Show(this,
+                @"Could not open the print dialog for the preview.",
+                @"Print Failed",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+    }
+
+    /// <summary>
+    /// Exports the current preview page to PDF when a render-triggered request is waiting.
+    /// </summary>
+    private async Task TryExportPdfIfPendingAsync()
+    {
+        if (String.IsNullOrWhiteSpace(_pendingPdfExportPath)) return;
+
+        String outputPath = _pendingPdfExportPath;
+        _pendingPdfExportPath = null;
+
+        if (!_previewReady || _previewBrowser.CoreWebView2 == null)
+        {
+            MessageBox.Show(this,
+                @"The preview is not ready to export yet.",
+                @"Export as PDF",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
+            return;
+        }
+
+        try
+        {
+            Boolean success = await _previewBrowser.CoreWebView2.PrintToPdfAsync(outputPath);
+
+            if (success) return;
+
+            MessageBox.Show(this,
+                @"Could not export the preview to PDF.",
+                @"Export Failed",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this,
+                $@"Could not export the preview to PDF.\r\n\r\n{ex.Message}",
+                @"Export Failed",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
     }
 
@@ -1292,9 +1460,12 @@ internal sealed partial class MarkupEditor : Form
     {
         if (!_previewReady) return;
 
-        int scrollLine = GetEditorCaretLine();
+        Int32 scrollLine = GetEditorCaretLine();
         _pendingPreviewScrollLine = scrollLine;
-        string html = MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml));
+
+        String html =
+            MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml));
+
         _previewBrowser.NavigateToString(html);
     }
 
@@ -1322,7 +1493,7 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>
     /// Runs all actions queued in <see cref="_deferredUntilHandleCreated"/> after the native handle is created.
     /// </summary>
-    private void MarkupEditor_HandleCreated(object sender, EventArgs e)
+    private void MarkupEditor_HandleCreated(Object sender, EventArgs e)
     {
         HandleCreated -= MarkupEditor_HandleCreated;
 
@@ -1341,14 +1512,15 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     private void UpdateWindowState()
     {
-        string fileName = string.IsNullOrWhiteSpace(_currentFilePath)
-            ? "Untitled.md"
-            : Path.GetFileName(_currentFilePath);
+        String fileName =
+            String.IsNullOrWhiteSpace(_currentFilePath)
+                ? "Untitled.md"
+                : Path.GetFileName(_currentFilePath);
 
-        fileReload.Enabled = !string.IsNullOrWhiteSpace(_currentFilePath);
-        Text = fileName + (_isDirty ? " *" : string.Empty) + " - Markup Editor";
-        _fileStatusLabel.Text = string.IsNullOrWhiteSpace(_currentFilePath) ? "Unsaved document" : _currentFilePath;
-        _modifiedStatusLabel.Text = _isDirty ? "Modified" : "Saved";
+        fileReload.Enabled = !String.IsNullOrWhiteSpace(_currentFilePath);
+        Text = fileName + (_isDirty ? " *" : String.Empty) + @" - Markup Editor";
+        _fileStatusLabel.Text = String.IsNullOrWhiteSpace(_currentFilePath) ? @"Unsaved document" : _currentFilePath;
+        _modifiedStatusLabel.Text = _isDirty ? @"Modified" : @"Saved";
     }
 
     #endregion

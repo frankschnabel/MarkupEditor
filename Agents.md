@@ -12,6 +12,9 @@ The app now includes:
 - File reload command with a discard-warning when the editor has unsaved changes.
 - External file-change detection: a `FileSystemWatcher` monitors the open file and alerts the user when another process modifies, deletes, or renames it, with an offer to reload. The alert is deferred until the application has focus — if the change occurs while the window is in the background, the prompt is shown as soon as the window is activated.
 - Save operations (including first Save and Save As) normalize the saved path, refresh MRU, and reattach file watching to the saved file. File-watcher events caused by the app's own save write are suppressed briefly so only true external edits prompt reload.
+- Print support for the rendered preview via File -> Print (Ctrl+P), which re-renders before opening the browser print dialog.
+- PDF export support for the rendered preview via File -> Export as PDF, which re-renders before generating the PDF.
+- TeX/LaTeX export support via File -> Export as TeX, which converts Markdown content into a standalone LaTeX document.
 - The self-save suppression window is configurable via user setting `SelfSaveWatcherSuppressMilliseconds` (default `2000`, bounded to `0..30000`).
 - File/status indicators in the status bar.
 - User settings (live preview, word wrap, horizontal split, line numbers, allow raw HTML, editor font size, splitter distance, window size/position/state) remembered between runs via `Properties/Settings.settings`.
@@ -95,7 +98,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 	- `StatusStrip` with file path and modified state.
 	- `Timer` (300 ms debounce for live preview).
 	- Menu items include:
-	  - **File**: New, Open, Recent Documents (up to 10 paths, persisted in `Settings.RecentDocuments`), Save, Save As, Export as HTML (Ctrl+Shift+E), Exit.
+	  - **File**: New, Open, Recent Documents (up to 10 paths, persisted in `Settings.RecentDocuments`), Save, Save As, Print (Ctrl+P), Export submenu with PDF, TeX, and HTML (Ctrl+Shift+E) entries, Exit.
 	  - **Edit**: Undo, Redo, Cut, Copy, Paste, **Find** (Ctrl+F) and **Replace** (Ctrl+H) via `FindReplaceDialog` (match case / whole word; affects the editor pane only), Select All.
 	  - **Tools**: Render Preview and **Settings…** (Ctrl+,) — opens the `SettingsDialog`; all settings are grouped there (Live Preview, Word Wrap, Horizontal Split, Line Numbers, Allow Raw HTML in Preview, editor font size).
 	  - **Help**: Supported Markup and About dialogs.

@@ -40,6 +40,10 @@ namespace MarkupEditor
             fileSep1 = new System.Windows.Forms.ToolStripSeparator();
             fileSave = new System.Windows.Forms.ToolStripMenuItem();
             fileSaveAs = new System.Windows.Forms.ToolStripMenuItem();
+            filePrint = new System.Windows.Forms.ToolStripMenuItem();
+            fileExportMenu = new System.Windows.Forms.ToolStripMenuItem();
+            fileExportPdf = new System.Windows.Forms.ToolStripMenuItem();
+            fileExportTex = new System.Windows.Forms.ToolStripMenuItem();
             fileExportHtml = new System.Windows.Forms.ToolStripMenuItem();
             fileSep2 = new System.Windows.Forms.ToolStripSeparator();
             fileExit = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,7 +96,7 @@ namespace MarkupEditor
             // 
             // fileMenu
             // 
-            fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { fileNew, fileOpen, fileReload, fileRecentSep, fileRecentDocuments, fileSep1, fileSave, fileSaveAs, fileExportHtml, fileSep2, fileExit });
+            fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { fileNew, fileOpen, fileReload, fileRecentSep, fileRecentDocuments, fileSep1, fileSave, fileSaveAs, filePrint, fileExportMenu, fileSep2, fileExit });
             fileMenu.Name = "fileMenu";
             fileMenu.Size = new System.Drawing.Size(37, 20);
             fileMenu.Text = "&File";
@@ -152,6 +156,35 @@ namespace MarkupEditor
             fileSaveAs.Size = new System.Drawing.Size(195, 22);
             fileSaveAs.Text = "Save &As...";
             fileSaveAs.Click += fileSaveAs_Click;
+            // 
+            // filePrint
+            // 
+            filePrint.Name = "filePrint";
+            filePrint.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P;
+            filePrint.Size = new System.Drawing.Size(195, 22);
+            filePrint.Text = "&Print...";
+            filePrint.Click += filePrint_Click;
+            // 
+            // fileExportMenu
+            // 
+            fileExportMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { fileExportPdf, fileExportTex, fileExportHtml });
+            fileExportMenu.Name = "fileExportMenu";
+            fileExportMenu.Size = new System.Drawing.Size(195, 22);
+            fileExportMenu.Text = "&Export";
+            // 
+            // fileExportPdf
+            // 
+            fileExportPdf.Name = "fileExportPdf";
+            fileExportPdf.Size = new System.Drawing.Size(195, 22);
+            fileExportPdf.Text = "Export as &PDF...";
+            fileExportPdf.Click += fileExportPdf_Click;
+            // 
+            // fileExportTex
+            // 
+            fileExportTex.Name = "fileExportTex";
+            fileExportTex.Size = new System.Drawing.Size(195, 22);
+            fileExportTex.Text = "Export as &TeX...";
+            fileExportTex.Click += fileExportTex_Click;
             // 
             // fileExportHtml
             // 
@@ -435,6 +468,10 @@ namespace MarkupEditor
         private System.Windows.Forms.ToolStripSeparator fileSep1;
         private System.Windows.Forms.ToolStripMenuItem fileSave;
         private System.Windows.Forms.ToolStripMenuItem fileSaveAs;
+        private System.Windows.Forms.ToolStripMenuItem filePrint;
+        private System.Windows.Forms.ToolStripMenuItem fileExportMenu;
+        private System.Windows.Forms.ToolStripMenuItem fileExportPdf;
+        private System.Windows.Forms.ToolStripMenuItem fileExportTex;
         private System.Windows.Forms.ToolStripMenuItem fileExportHtml;
         private System.Windows.Forms.ToolStripSeparator fileSep2;
         private System.Windows.Forms.ToolStripMenuItem fileExit;
