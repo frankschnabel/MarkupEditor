@@ -140,6 +140,7 @@ internal static class MarkupParser
                "\\usepackage{hyperref}\n" +
                "\\usepackage{graphicx}\n" +
                "\\usepackage[normalem]{ulem}\n" +
+               "\\usepackage[margin=1in]{geometry}" +
                "\\begin{document}\n\n" +
                body +
                "\n\\end{document}\n";
@@ -236,6 +237,7 @@ internal static class MarkupParser
         ref Boolean inEnumerate, ref Boolean inQuote)
     {
         Match match = Regex.Match(line, @"^(#{1,6})\s+(.+)$");
+
         if (!match.Success) return false;
 
         CloseLists(builder, ref inItemize, ref inEnumerate);
@@ -256,6 +258,7 @@ internal static class MarkupParser
         ref Boolean inEnumerate, ref Boolean inQuote)
     {
         Match quoteMatch = Regex.Match(line, @"^>\s?(.*)$");
+
         if (!quoteMatch.Success)
         {
             CloseQuote(builder, ref inQuote);
@@ -284,6 +287,7 @@ internal static class MarkupParser
         ref Boolean inEnumerate)
     {
         Match itemMatch = Regex.Match(line, @"^[-*+]\s+(.+)$");
+
         if (!itemMatch.Success) return false;
 
         if (inEnumerate)
@@ -310,6 +314,7 @@ internal static class MarkupParser
         ref Boolean inEnumerate)
     {
         Match itemMatch = Regex.Match(line, @"^\d+\.\s+(.+)$");
+
         if (!itemMatch.Success) return false;
 
         if (inItemize)
