@@ -16,9 +16,10 @@ internal sealed partial class SettingsDialog : Form
     /// <param name="horizontalSplit">Whether horizontal split is currently active.</param>
     /// <param name="showLineNumbers">Whether the line number gutter is visible.</param>
     /// <param name="allowRawHtml">Whether raw HTML passthrough is enabled in the preview.</param>
+    /// <param name="windowsNewMarkdownDocument">Whether Windows New/Markdown Document integration is enabled.</param>
     /// <param name="fontSize">Current editor font size in points.</param>
     public SettingsDialog(Boolean livePreview, Boolean wordWrap, Boolean horizontalSplit, Boolean showLineNumbers,
-        Boolean allowRawHtml, Single fontSize)
+        Boolean allowRawHtml, Boolean windowsNewMarkdownDocument, Single fontSize)
     {
         InitializeComponent();
 
@@ -27,6 +28,7 @@ internal sealed partial class SettingsDialog : Form
         _horizontalSplitCheckBox.Checked = horizontalSplit;
         _showLineNumbersCheckBox.Checked = showLineNumbers;
         _allowRawHtmlCheckBox.Checked = allowRawHtml;
+        _windowsNewMarkdownDocumentCheckBox.Checked = windowsNewMarkdownDocument;
         _fontSizeUpDown.Value = (Decimal)Math.Max(8f, Math.Min(28f, fontSize));
     }
 
@@ -44,6 +46,9 @@ internal sealed partial class SettingsDialog : Form
 
     /// <summary>Gets the allow raw HTML setting chosen by the user.</summary>
     public Boolean AllowRawHtml => _allowRawHtmlCheckBox.Checked;
+
+    /// <summary>Gets whether Windows New/Markdown Document integration should be enabled.</summary>
+    public Boolean WindowsNewMarkdownDocument => _windowsNewMarkdownDocumentCheckBox.Checked;
 
     /// <summary>Gets the editor font size chosen by the user.</summary>
     public Single FontSize => (Single)_fontSizeUpDown.Value;

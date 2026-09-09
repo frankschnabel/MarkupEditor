@@ -15,6 +15,9 @@ The app now includes:
 - Print support for the rendered preview via File -> Print (Ctrl+P), which re-renders before opening the browser print dialog.
 - PDF export support for the rendered preview via File -> Export as PDF, which re-renders before generating the PDF.
 - TeX/LaTeX export support via File -> Export as TeX, which converts Markdown content into a standalone LaTeX document.
+- Optional Windows shell integration for "New > Markdown Document" (per-user, HKCU), controlled from application settings.
+- Windows shell integration now writes managed `ShellNew` markers under `.md`, the effective `.md` ProgID, and any active per-user UserChoice ProgID (for example `Applications\\MarkupEditor.exe`) in HKCU, including `NullFile` and `ItemName="Markdown Document"`; it also backfills friendly type metadata for MarkupEditor-owned ProgIDs when missing.
+- Enabling Windows shell integration also ensures `.md` is present in Explorer's per-user ShellNew cache (`HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Discardable\\PostSetup\\ShellNew\\Classes`) so the New submenu can surface the entry immediately.
 - The self-save suppression window is configurable via user setting `SelfSaveWatcherSuppressMilliseconds` (default `2000`, bounded to `0..30000`).
 - File/status indicators in the status bar.
 - User settings (live preview, word wrap, horizontal split, line numbers, allow raw HTML, editor font size, splitter distance, window size/position/state) remembered between runs via `Properties/Settings.settings`.
@@ -49,6 +52,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 - `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
 - `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
 - `SettingsDialog.cs` / `SettingsDialog.Designer.cs` — modal Settings dialog; exposes Live Preview, Word Wrap, Horizontal Split, Line Numbers, Allow Raw HTML, and editor font size.
+- `WindowsShellNewMarkdownRegistration.cs` — creates/removes per-user registry keys for the Explorer New-menu Markdown document entry.
 - `LineNumberPanel.cs` — custom `Panel` that renders logical line numbers alongside the editor; hides itself when word wrap is enabled.
 - `MarkupParser.cs` — static `MarkupParser` class; builds the Markdig pipeline and converts Markdown to an HTML body fragment.
 - `PreviewLineAnchorUtility.cs` — assigns `id="me-line-*"` on block nodes for preview scroll/highlight (first block per source line).
@@ -88,6 +92,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 	- Document workflow methods (New, Open, Reload, Save, SaveAs).
 	- Delegates rendering to `MarkupParser` (Markdig).
 	- UI behavior (live preview toggle, word wrap, horizontal split toggle, line numbers toggle, allow raw HTML toggle, font size controls).
+	- Optional Windows integration toggle: adds/removes Explorer `New > Markdown Document` by creating/removing `HKCU\Software\Classes\.md\ShellNew` and related ProgID keys.
 	- **File watching:** `StartWatchingFile` / `StopWatchingFile` manage a `FileSystemWatcher` on the currently open file. `_fileWatcher_ExternalChange` (background thread) sets `_externalChangePending` and marshals to the UI thread; if the form already has focus (`ContainsFocus`) the alert is shown immediately via `OnFileChangedExternally`, otherwise it is deferred until `MarkupEditor_Activated` fires.
 - `MarkupEditor.Designer.cs` builds the full UI declaratively:
 	- `MenuStrip` with File, Edit, Tools/Settings, Help menus.

@@ -38,6 +38,7 @@ internal sealed partial class MarkupEditor : Form
     private Boolean _livePreviewEnabled;
     private Boolean _previewReady;
     private Boolean _allowRawHtml;
+    private Boolean _windowsNewMarkdownDocument;
     private Int32 _selfSaveWatcherSuppressMilliseconds = SelfSaveWatcherSuppressMillisecondsDefault;
     private Int32 _pendingPreviewScrollLine = -1;
     private Boolean _pendingPrintAfterRender;
@@ -591,6 +592,9 @@ internal sealed partial class MarkupEditor : Form
         _lineNumberPanel.Visible = s.ShowLineNumbers;
 
         _allowRawHtml = s.AllowRawHtml;
+        _windowsNewMarkdownDocument = s.WindowsNewMarkdownDocument;
+
+        ApplyWindowsNewMarkdownRegistration();
 
         _selfSaveWatcherSuppressMilliseconds =
             ClampSelfSaveWatcherSuppressMilliseconds(s.SelfSaveWatcherSuppressMilliseconds);
@@ -636,6 +640,7 @@ internal sealed partial class MarkupEditor : Form
         s.HorizontalSplit = _mainSplit.Orientation == Orientation.Horizontal;
         s.ShowLineNumbers = _lineNumberPanel.Visible;
         s.AllowRawHtml = _allowRawHtml;
+        s.WindowsNewMarkdownDocument = _windowsNewMarkdownDocument;
 
         s.SelfSaveWatcherSuppressMilliseconds =
             ClampSelfSaveWatcherSuppressMilliseconds(_selfSaveWatcherSuppressMilliseconds);
@@ -1172,6 +1177,7 @@ internal sealed partial class MarkupEditor : Form
                 _mainSplit.Orientation == Orientation.Horizontal,
                 _lineNumberPanel.Visible,
                 _allowRawHtml,
+                _windowsNewMarkdownDocument,
                 _editorTextBox.Font.Size);
 
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
@@ -1210,12 +1216,38 @@ internal sealed partial class MarkupEditor : Form
         Boolean allowRawHtmlChanged = _allowRawHtml != dialog.AllowRawHtml;
         _allowRawHtml = dialog.AllowRawHtml;
 
+        Boolean windowsNewMarkdownChanged = _windowsNewMarkdownDocument != dialog.WindowsNewMarkdownDocument;
+        _windowsNewMarkdownDocument = dialog.WindowsNewMarkdownDocument;
+
         Single newFontSize = dialog.FontSize;
 
         if (Math.Abs(newFontSize - _editorTextBox.Font.Size) > 0.01f)
             _editorTextBox.Font = new Font(_editorTextBox.Font.FontFamily, newFontSize, _editorTextBox.Font.Style);
 
+        if (windowsNewMarkdownChanged) ApplyWindowsNewMarkdownRegistration();
+
         if (allowRawHtmlChanged) DoRenderPreview();
+    }
+
+    /// <summary>
+    /// Applies Windows Explorer New-menu markdown registration to match the current setting.
+    /// </summary>
+    private void ApplyWindowsNewMarkdownRegistration()
+    {
+        try
+        {
+            WindowsShellNewMarkdownRegistration.Apply(_windowsNewMarkdownDocument);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this,
+                $@"Could not update the Windows New/Markdown Document menu entry.
+
+{ex.Message}",
+                @"Windows Integration",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+        }
     }
 
     #endregion

@@ -21,11 +21,14 @@ namespace MarkupEditor
             _livePreviewCheckBox = new System.Windows.Forms.CheckBox();
             _horizontalSplitCheckBox = new System.Windows.Forms.CheckBox();
             _allowRawHtmlCheckBox = new System.Windows.Forms.CheckBox();
+            _windowsGroup = new System.Windows.Forms.GroupBox();
+            _windowsNewMarkdownDocumentCheckBox = new System.Windows.Forms.CheckBox();
             _okButton = new System.Windows.Forms.Button();
             _cancelButton = new System.Windows.Forms.Button();
             _editorGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)_fontSizeUpDown).BeginInit();
             _previewGroup.SuspendLayout();
+            _windowsGroup.SuspendLayout();
             SuspendLayout();
             // 
             // _editorGroup
@@ -36,7 +39,7 @@ namespace MarkupEditor
             _editorGroup.Controls.Add(_showLineNumbersCheckBox);
             _editorGroup.Location = new System.Drawing.Point(12, 12);
             _editorGroup.Name = "_editorGroup";
-            _editorGroup.Size = new System.Drawing.Size(290, 106);
+            _editorGroup.Size = new System.Drawing.Size(400, 106);
             _editorGroup.TabIndex = 0;
             _editorGroup.TabStop = false;
             _editorGroup.Text = "Editor";
@@ -86,7 +89,7 @@ namespace MarkupEditor
             _previewGroup.Controls.Add(_allowRawHtmlCheckBox);
             _previewGroup.Location = new System.Drawing.Point(12, 128);
             _previewGroup.Name = "_previewGroup";
-            _previewGroup.Size = new System.Drawing.Size(290, 104);
+            _previewGroup.Size = new System.Drawing.Size(400, 104);
             _previewGroup.TabIndex = 1;
             _previewGroup.TabStop = false;
             _previewGroup.Text = "Preview";
@@ -118,21 +121,40 @@ namespace MarkupEditor
             _allowRawHtmlCheckBox.TabIndex = 2;
             _allowRawHtmlCheckBox.Text = "Allow &Raw HTML in Preview";
             // 
+            // _windowsGroup
+            // 
+            _windowsGroup.Controls.Add(_windowsNewMarkdownDocumentCheckBox);
+            _windowsGroup.Location = new System.Drawing.Point(12, 238);
+            _windowsGroup.Name = "_windowsGroup";
+            _windowsGroup.Size = new System.Drawing.Size(400, 56);
+            _windowsGroup.TabIndex = 2;
+            _windowsGroup.TabStop = false;
+            _windowsGroup.Text = "Windows";
+            // 
+            // _windowsNewMarkdownDocumentCheckBox
+            // 
+            _windowsNewMarkdownDocumentCheckBox.AutoSize = true;
+            _windowsNewMarkdownDocumentCheckBox.Location = new System.Drawing.Point(10, 24);
+            _windowsNewMarkdownDocumentCheckBox.Name = "_windowsNewMarkdownDocumentCheckBox";
+            _windowsNewMarkdownDocumentCheckBox.Size = new System.Drawing.Size(260, 19);
+            _windowsNewMarkdownDocumentCheckBox.TabIndex = 0;
+            _windowsNewMarkdownDocumentCheckBox.Text = "Add \"New > Markdown Document\" menu entry";
+            // 
             // _okButton
             // 
-            _okButton.Location = new System.Drawing.Point(146, 244);
+            _okButton.Location = new System.Drawing.Point(256, 307);
             _okButton.Name = "_okButton";
             _okButton.Size = new System.Drawing.Size(75, 26);
-            _okButton.TabIndex = 2;
+            _okButton.TabIndex = 3;
             _okButton.Text = "OK";
             _okButton.Click += _okButton_Click;
             // 
             // _cancelButton
             // 
-            _cancelButton.Location = new System.Drawing.Point(227, 244);
+            _cancelButton.Location = new System.Drawing.Point(337, 307);
             _cancelButton.Name = "_cancelButton";
             _cancelButton.Size = new System.Drawing.Size(75, 26);
-            _cancelButton.TabIndex = 3;
+            _cancelButton.TabIndex = 4;
             _cancelButton.Text = "Cancel";
             _cancelButton.Click += _cancelButton_Click;
             // 
@@ -142,9 +164,10 @@ namespace MarkupEditor
             CancelButton = _cancelButton;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(314, 282);
+            ClientSize = new System.Drawing.Size(424, 345);
             Controls.Add(_editorGroup);
             Controls.Add(_previewGroup);
+            Controls.Add(_windowsGroup);
             Controls.Add(_okButton);
             Controls.Add(_cancelButton);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -159,6 +182,8 @@ namespace MarkupEditor
             ((System.ComponentModel.ISupportInitialize)_fontSizeUpDown).EndInit();
             _previewGroup.ResumeLayout(false);
             _previewGroup.PerformLayout();
+            _windowsGroup.ResumeLayout(false);
+            _windowsGroup.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -171,6 +196,8 @@ namespace MarkupEditor
         private System.Windows.Forms.CheckBox _livePreviewCheckBox;
         private System.Windows.Forms.CheckBox _horizontalSplitCheckBox;
         private System.Windows.Forms.CheckBox _allowRawHtmlCheckBox;
+        private System.Windows.Forms.GroupBox _windowsGroup;
+        private System.Windows.Forms.CheckBox _windowsNewMarkdownDocumentCheckBox;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
     }

@@ -203,5 +203,20 @@ namespace MarkupEditor.Properties
                 this["SelfSaveWatcherSuppressMilliseconds"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool WindowsNewMarkdownDocument
+        {
+            get
+            {
+                return ((bool)(this["WindowsNewMarkdownDocument"]));
+            }
+            set
+            {
+                this["WindowsNewMarkdownDocument"] = value;
+            }
+        }
     }
 }
