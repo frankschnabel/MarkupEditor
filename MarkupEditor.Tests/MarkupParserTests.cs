@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Text.RegularExpressions;
 
 namespace MarkupEditor.Tests;
 
@@ -131,6 +132,31 @@ public sealed class MarkupParserTests
         String html = MarkupParser.ConvertMarkupToHtml("# Title\n");
 
         StringAssert.Contains(html, "id=\"me-line-0\"");
+    }
+
+    /// <summary>
+    /// HTML line-break tags render as actual line breaks even when raw HTML is otherwise escaped.
+    /// </summary>
+    [TestMethod]
+    public void ConvertMarkupToHtml_BrTag_ProducesHtmlBreak()
+    {
+        const String md = "first<br />second<br/>third<BR>fourth\n";
+        String html = MarkupParser.ConvertMarkupToHtml(md);
+
+        Assert.AreEqual(3, Regex.Matches(html, "<br\\b[^>]*>", RegexOptions.IgnoreCase).Count);
+    }
+
+    /// <summary>
+    /// A line break inside a table cell stays in that cell without creating a new table row.
+    /// </summary>
+    [TestMethod]
+    public void ConvertMarkupToHtml_TableCellBr_StaysInCell()
+    {
+        const String md = "| a | b |\n|---|---|\n| one<br/>two | three |\n";
+        String html = MarkupParser.ConvertMarkupToHtml(md);
+
+        StringAssert.Contains(html, "<td>one<br />two</td>");
+        Assert.AreEqual(1, Regex.Matches(html, "<tr>", RegexOptions.IgnoreCase).Count);
     }
 
     /// <summary>

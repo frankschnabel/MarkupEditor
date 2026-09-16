@@ -106,11 +106,12 @@ internal static class MarkupParser
     internal static String ConvertMarkupToHtml(String source, Boolean allowHtml = false)
     {
         String normalized = source.Replace("\r\n", "\n").Replace("\r", "\n");
+        String protectedBreaks = NormalizeHtmlLineBreaks(normalized);
 
-        if (normalized.Length == 0) return "<p id=\"me-line-0\"></p>";
+        if (protectedBreaks.Length == 0) return "<p id=\"me-line-0\"></p>";
 
         MarkdownPipeline pipeline = allowHtml ? MarkdownPipelineWithHtml : MarkdownPipeline;
-        MarkdownDocument document = Markdown.Parse(normalized, pipeline);
+        MarkdownDocument document = Markdown.Parse(protectedBreaks, pipeline);
         PreviewLineAnchorUtility.AssignPreviewLineAnchors(document);
 
         StringWriter writer = new(CultureInfo.InvariantCulture);
@@ -118,7 +119,17 @@ internal static class MarkupParser
         pipeline.Setup(renderer);
         renderer.Render(document);
 
-        return writer.ToString();
+        return writer.ToString().Replace("ME_BR_PLACEHOLDER", "<br />");
+    }
+
+    /// <summary>
+    /// Protects HTML line-break tags during Markdown parsing so table rows remain intact, then restores them as real breaks in the final HTML.
+    /// </summary>
+    private static String NormalizeHtmlLineBreaks(String source)
+    {
+        if (String.IsNullOrEmpty(source)) return source;
+
+        return Regex.Replace(source, "<br\\b[^>]*>", "ME_BR_PLACEHOLDER", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
 
     #endregion

@@ -39,7 +39,7 @@ Rendering uses **[Markdig](https://github.com/xoofx/markdig)** with a pipeline a
 - **Inline code:** `` `...` ``
 - **Links and images:** inline and **reference-style**; **footnotes** (`[^id]` with definitions)
 - **Autolinks** for bare `http`/`https` URLs
-- **HTML passthrough policy:** raw HTML in the source is **not** executed in the preview; the pipeline uses Markdig’s **DisableHtml** so angle-bracket markup is treated as text (safe preview).
+- **HTML passthrough policy:** raw HTML in the source is **not** executed in the preview; the pipeline uses Markdig’s **DisableHtml** so angle-bracket markup is treated as text (safe preview), except **`<br>` / `<br/>` / `<BR>` and variants** which are normalized into Markdown hard breaks before rendering so they visibly create a new line.
 
 For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) and [GitHub Flavored Markdown](https://github.github.com/gfm/).
 
