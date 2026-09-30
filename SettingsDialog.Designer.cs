@@ -12,137 +12,41 @@ namespace MarkupEditor
 
         private void InitializeComponent()
         {
-            _editorGroup = new System.Windows.Forms.GroupBox();
-            _fontSizeLabel = new System.Windows.Forms.Label();
-            _fontSizeUpDown = new System.Windows.Forms.NumericUpDown();
-            _wordWrapCheckBox = new System.Windows.Forms.CheckBox();
-            _showLineNumbersCheckBox = new System.Windows.Forms.CheckBox();
-            _previewGroup = new System.Windows.Forms.GroupBox();
-            _livePreviewCheckBox = new System.Windows.Forms.CheckBox();
-            _horizontalSplitCheckBox = new System.Windows.Forms.CheckBox();
-            _allowRawHtmlCheckBox = new System.Windows.Forms.CheckBox();
-            _windowsGroup = new System.Windows.Forms.GroupBox();
-            _windowsNewMarkdownDocumentCheckBox = new System.Windows.Forms.CheckBox();
+            _categoriesListBox = new System.Windows.Forms.ListBox();
+            _settingsPanel = new System.Windows.Forms.Panel();
             _okButton = new System.Windows.Forms.Button();
             _cancelButton = new System.Windows.Forms.Button();
-            _editorGroup.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)_fontSizeUpDown).BeginInit();
-            _previewGroup.SuspendLayout();
-            _windowsGroup.SuspendLayout();
             SuspendLayout();
-            // 
-            // _editorGroup
-            // 
-            _editorGroup.Controls.Add(_fontSizeLabel);
-            _editorGroup.Controls.Add(_fontSizeUpDown);
-            _editorGroup.Controls.Add(_wordWrapCheckBox);
-            _editorGroup.Controls.Add(_showLineNumbersCheckBox);
-            _editorGroup.Location = new System.Drawing.Point(12, 12);
-            _editorGroup.Name = "_editorGroup";
-            _editorGroup.Size = new System.Drawing.Size(400, 106);
-            _editorGroup.TabIndex = 0;
-            _editorGroup.TabStop = false;
-            _editorGroup.Text = "Editor";
-            // 
-            // _fontSizeLabel
-            // 
-            _fontSizeLabel.AutoSize = true;
-            _fontSizeLabel.Location = new System.Drawing.Point(10, 24);
-            _fontSizeLabel.Name = "_fontSizeLabel";
-            _fontSizeLabel.Size = new System.Drawing.Size(57, 15);
-            _fontSizeLabel.TabIndex = 0;
-            _fontSizeLabel.Text = "Font Size:";
-            // 
-            // _fontSizeUpDown
-            // 
-            _fontSizeUpDown.DecimalPlaces = 0;
-            _fontSizeUpDown.Location = new System.Drawing.Point(76, 22);
-            _fontSizeUpDown.Maximum = new decimal(new int[] { 28, 0, 0, 0 });
-            _fontSizeUpDown.Minimum = new decimal(new int[] { 8, 0, 0, 0 });
-            _fontSizeUpDown.Name = "_fontSizeUpDown";
-            _fontSizeUpDown.Size = new System.Drawing.Size(56, 23);
-            _fontSizeUpDown.TabIndex = 1;
-            _fontSizeUpDown.Value = new decimal(new int[] { 11, 0, 0, 0 });
-            // 
-            // _wordWrapCheckBox
-            // 
-            _wordWrapCheckBox.AutoSize = true;
-            _wordWrapCheckBox.Location = new System.Drawing.Point(10, 54);
-            _wordWrapCheckBox.Name = "_wordWrapCheckBox";
-            _wordWrapCheckBox.Size = new System.Drawing.Size(82, 19);
-            _wordWrapCheckBox.TabIndex = 2;
-            _wordWrapCheckBox.Text = "Word &Wrap";
-            // 
-            // _showLineNumbersCheckBox
-            // 
-            _showLineNumbersCheckBox.AutoSize = true;
-            _showLineNumbersCheckBox.Location = new System.Drawing.Point(10, 79);
-            _showLineNumbersCheckBox.Name = "_showLineNumbersCheckBox";
-            _showLineNumbersCheckBox.Size = new System.Drawing.Size(100, 19);
-            _showLineNumbersCheckBox.TabIndex = 3;
-            _showLineNumbersCheckBox.Text = "&Line Numbers";
-            // 
-            // _previewGroup
-            // 
-            _previewGroup.Controls.Add(_livePreviewCheckBox);
-            _previewGroup.Controls.Add(_horizontalSplitCheckBox);
-            _previewGroup.Controls.Add(_allowRawHtmlCheckBox);
-            _previewGroup.Location = new System.Drawing.Point(12, 128);
-            _previewGroup.Name = "_previewGroup";
-            _previewGroup.Size = new System.Drawing.Size(400, 104);
-            _previewGroup.TabIndex = 1;
-            _previewGroup.TabStop = false;
-            _previewGroup.Text = "Preview";
-            // 
-            // _livePreviewCheckBox
-            // 
-            _livePreviewCheckBox.AutoSize = true;
-            _livePreviewCheckBox.Location = new System.Drawing.Point(10, 24);
-            _livePreviewCheckBox.Name = "_livePreviewCheckBox";
-            _livePreviewCheckBox.Size = new System.Drawing.Size(91, 19);
-            _livePreviewCheckBox.TabIndex = 0;
-            _livePreviewCheckBox.Text = "&Live Preview";
-            // 
-            // _horizontalSplitCheckBox
-            // 
-            _horizontalSplitCheckBox.AutoSize = true;
-            _horizontalSplitCheckBox.Location = new System.Drawing.Point(10, 49);
-            _horizontalSplitCheckBox.Name = "_horizontalSplitCheckBox";
-            _horizontalSplitCheckBox.Size = new System.Drawing.Size(109, 19);
-            _horizontalSplitCheckBox.TabIndex = 1;
-            _horizontalSplitCheckBox.Text = "&Horizontal Split";
-            // 
-            // _allowRawHtmlCheckBox
-            // 
-            _allowRawHtmlCheckBox.AutoSize = true;
-            _allowRawHtmlCheckBox.Location = new System.Drawing.Point(10, 74);
-            _allowRawHtmlCheckBox.Name = "_allowRawHtmlCheckBox";
-            _allowRawHtmlCheckBox.Size = new System.Drawing.Size(163, 19);
-            _allowRawHtmlCheckBox.TabIndex = 2;
-            _allowRawHtmlCheckBox.Text = "Allow &Raw HTML in Preview";
-            // 
-            // _windowsGroup
-            // 
-            _windowsGroup.Controls.Add(_windowsNewMarkdownDocumentCheckBox);
-            _windowsGroup.Location = new System.Drawing.Point(12, 238);
-            _windowsGroup.Name = "_windowsGroup";
-            _windowsGroup.Size = new System.Drawing.Size(400, 56);
-            _windowsGroup.TabIndex = 2;
-            _windowsGroup.TabStop = false;
-            _windowsGroup.Text = "Windows";
-            // 
-            // _windowsNewMarkdownDocumentCheckBox
-            // 
-            _windowsNewMarkdownDocumentCheckBox.AutoSize = true;
-            _windowsNewMarkdownDocumentCheckBox.Location = new System.Drawing.Point(10, 24);
-            _windowsNewMarkdownDocumentCheckBox.Name = "_windowsNewMarkdownDocumentCheckBox";
-            _windowsNewMarkdownDocumentCheckBox.Size = new System.Drawing.Size(260, 19);
-            _windowsNewMarkdownDocumentCheckBox.TabIndex = 0;
-            _windowsNewMarkdownDocumentCheckBox.Text = "Add \"New > Markdown Document\" menu entry";
+            //
+            // _categoriesListBox
+            //
+            _categoriesListBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            _categoriesListBox.FormattingEnabled = true;
+            _categoriesListBox.IntegralHeight = false;
+            _categoriesListBox.ItemHeight = 20;
+            _categoriesListBox.Items.AddRange(new object[] {
+                "General",
+                "Editor Text",
+                "Line Numbers",
+                "Preview Text",
+                "Preview Code",
+                "Preview Headers"});
+            _categoriesListBox.Location = new System.Drawing.Point(12, 12);
+            _categoriesListBox.Name = "_categoriesListBox";
+            _categoriesListBox.Size = new System.Drawing.Size(154, 344);
+            _categoriesListBox.TabIndex = 0;
+            //
+            // _settingsPanel
+            //
+            _settingsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            _settingsPanel.Location = new System.Drawing.Point(176, 12);
+            _settingsPanel.Name = "_settingsPanel";
+            _settingsPanel.Size = new System.Drawing.Size(420, 344);
+            _settingsPanel.TabIndex = 1;
             // 
             // _okButton
             // 
-            _okButton.Location = new System.Drawing.Point(256, 307);
+            _okButton.Location = new System.Drawing.Point(440, 368);
             _okButton.Name = "_okButton";
             _okButton.Size = new System.Drawing.Size(75, 26);
             _okButton.TabIndex = 3;
@@ -151,7 +55,7 @@ namespace MarkupEditor
             // 
             // _cancelButton
             // 
-            _cancelButton.Location = new System.Drawing.Point(337, 307);
+            _cancelButton.Location = new System.Drawing.Point(521, 368);
             _cancelButton.Name = "_cancelButton";
             _cancelButton.Size = new System.Drawing.Size(75, 26);
             _cancelButton.TabIndex = 4;
@@ -164,10 +68,9 @@ namespace MarkupEditor
             CancelButton = _cancelButton;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(424, 345);
-            Controls.Add(_editorGroup);
-            Controls.Add(_previewGroup);
-            Controls.Add(_windowsGroup);
+            ClientSize = new System.Drawing.Size(608, 407);
+            Controls.Add(_categoriesListBox);
+            Controls.Add(_settingsPanel);
             Controls.Add(_okButton);
             Controls.Add(_cancelButton);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -177,27 +80,11 @@ namespace MarkupEditor
             ShowInTaskbar = false;
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Settings";
-            _editorGroup.ResumeLayout(false);
-            _editorGroup.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)_fontSizeUpDown).EndInit();
-            _previewGroup.ResumeLayout(false);
-            _previewGroup.PerformLayout();
-            _windowsGroup.ResumeLayout(false);
-            _windowsGroup.PerformLayout();
             ResumeLayout(false);
         }
 
-        private System.Windows.Forms.GroupBox _editorGroup;
-        private System.Windows.Forms.Label _fontSizeLabel;
-        private System.Windows.Forms.NumericUpDown _fontSizeUpDown;
-        private System.Windows.Forms.CheckBox _wordWrapCheckBox;
-        private System.Windows.Forms.CheckBox _showLineNumbersCheckBox;
-        private System.Windows.Forms.GroupBox _previewGroup;
-        private System.Windows.Forms.CheckBox _livePreviewCheckBox;
-        private System.Windows.Forms.CheckBox _horizontalSplitCheckBox;
-        private System.Windows.Forms.CheckBox _allowRawHtmlCheckBox;
-        private System.Windows.Forms.GroupBox _windowsGroup;
-        private System.Windows.Forms.CheckBox _windowsNewMarkdownDocumentCheckBox;
+        private System.Windows.Forms.ListBox _categoriesListBox;
+        private System.Windows.Forms.Panel _settingsPanel;
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
     }

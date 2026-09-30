@@ -71,6 +71,151 @@ namespace MarkupEditor.Properties
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Consolas")]
+        public string EditorFontFamily { get { return ((string)(this["EditorFontFamily"])); } set { this["EditorFontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#000000")]
+        public string EditorFontColor { get { return ((string)(this["EditorFontColor"])); } set { this["EditorFontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string LineNumberFontFamily { get { return ((string)(this["LineNumberFontFamily"])); } set { this["LineNumberFontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9")]
+        public float LineNumberFontSize { get { return ((float)(this["LineNumberFontSize"])); } set { this["LineNumberFontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#6B7280")]
+        public string LineNumberFontColor { get { return ((string)(this["LineNumberFontColor"])); } set { this["LineNumberFontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string PreviewFontFamily { get { return ((string)(this["PreviewFontFamily"])); } set { this["PreviewFontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("11")]
+        public float PreviewFontSize { get { return ((float)(this["PreviewFontSize"])); } set { this["PreviewFontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewFontColor { get { return ((string)(this["PreviewFontColor"])); } set { this["PreviewFontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Consolas")]
+        public string PreviewCodeFontFamily { get { return ((string)(this["PreviewCodeFontFamily"])); } set { this["PreviewCodeFontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public float PreviewCodeFontSize { get { return ((float)(this["PreviewCodeFontSize"])); } set { this["PreviewCodeFontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewCodeFontColor { get { return ((string)(this["PreviewCodeFontColor"])); } set { this["PreviewCodeFontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string PreviewH1FontFamily { get { return ((string)(this["PreviewH1FontFamily"])); } set { this["PreviewH1FontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("22")]
+        public float PreviewH1FontSize { get { return ((float)(this["PreviewH1FontSize"])); } set { this["PreviewH1FontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewH1FontColor { get { return ((string)(this["PreviewH1FontColor"])); } set { this["PreviewH1FontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string PreviewH2FontFamily { get { return ((string)(this["PreviewH2FontFamily"])); } set { this["PreviewH2FontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16.5")]
+        public float PreviewH2FontSize { get { return ((float)(this["PreviewH2FontSize"])); } set { this["PreviewH2FontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewH2FontColor { get { return ((string)(this["PreviewH2FontColor"])); } set { this["PreviewH2FontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string PreviewH3FontFamily { get { return ((string)(this["PreviewH3FontFamily"])); } set { this["PreviewH3FontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("13")]
+        public float PreviewH3FontSize { get { return ((float)(this["PreviewH3FontSize"])); } set { this["PreviewH3FontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewH3FontColor { get { return ((string)(this["PreviewH3FontColor"])); } set { this["PreviewH3FontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string PreviewH4FontFamily { get { return ((string)(this["PreviewH4FontFamily"])); } set { this["PreviewH4FontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("11")]
+        public float PreviewH4FontSize { get { return ((float)(this["PreviewH4FontSize"])); } set { this["PreviewH4FontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewH4FontColor { get { return ((string)(this["PreviewH4FontColor"])); } set { this["PreviewH4FontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string PreviewH5FontFamily { get { return ((string)(this["PreviewH5FontFamily"])); } set { this["PreviewH5FontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9")]
+        public float PreviewH5FontSize { get { return ((float)(this["PreviewH5FontSize"])); } set { this["PreviewH5FontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewH5FontColor { get { return ((string)(this["PreviewH5FontColor"])); } set { this["PreviewH5FontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI")]
+        public string PreviewH6FontFamily { get { return ((string)(this["PreviewH6FontFamily"])); } set { this["PreviewH6FontFamily"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7.5")]
+        public float PreviewH6FontSize { get { return ((float)(this["PreviewH6FontSize"])); } set { this["PreviewH6FontSize"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#222222")]
+        public string PreviewH6FontColor { get { return ((string)(this["PreviewH6FontColor"])); } set { this["PreviewH6FontColor"] = value; } }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("480")]
         public int SplitterDistance
         {

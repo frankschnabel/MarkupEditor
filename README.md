@@ -7,19 +7,15 @@ A small **Windows Forms** editor for **Markdown** with a **live HTML preview**. 
 - Split view with selectable orientation: **vertical** (editor left, preview right) or **horizontal** (editor top, preview bottom)
 - **Debounced** automatic preview while typing, backed by **WebView2** for modern Chromium-based rendering
 - **Tools** → **Settings...** (`Ctrl+,`) opens a custom dialog for:
-	- Live Preview
-	- Word Wrap
-	- Horizontal Split
-	- Line Numbers
-	- Allow Raw HTML in Preview
-	- Editor font size
+	- General behavior: Live Preview, Word Wrap, Horizontal Split, Line Numbers, Allow Raw HTML in Preview, and Windows shell integration
+	- Appearance: font face, text color, and size configured independently for editor text, line numbers, preview text, preview code, and each preview heading level (H1-H6)
 - **File** menu: New, Open, Reload, Save, Save As, **Export as HTML**, **Recent documents** (last 10), Exit
 - Unsaved-change prompts when closing, creating a new document, opening another file, or reloading from disk
 - External file-change detection: if the open file is modified, renamed, or deleted by another process, the app alerts you and offers to reload when appropriate
 - UTF-8 open/save; optional **command-line path** to open a file on startup (works with file associations)
 - **Preview follows the caret**: the rendered block for the current source line is scrolled into view and highlighted
 - Optional **line-number gutter** for the editor when word wrap is off
-- Settings remembered between sessions: live preview, word wrap, split orientation, line numbers, raw HTML policy, font size, splitter distance, and window layout
+- Settings remembered between sessions: live preview, word wrap, split orientation, line numbers, raw HTML policy, per-element font appearance including H1-H6, splitter distance, and window layout
 - **Help** → Supported Markup summarizes the syntax and preview behavior
 
 ## Requirements
@@ -79,6 +75,7 @@ By default, raw HTML in the source is **not** interpreted in the preview and is 
 | `MarkupEditor.sln` | Solution |
 | `MarkupEditor.cs` / `MarkupEditor.Designer.cs` | Main form and UI layout |
 | `SettingsDialog.cs` / `SettingsDialog.Designer.cs` | Custom modal Settings dialog |
+| `DisplayFontSettings.cs` | Per-element font appearance values |
 | `LineNumberPanel.cs` | Custom editor gutter for logical line numbers |
 | `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` | Find / replace dialog |
 | `MarkupParser.cs` / `PreviewLineAnchorUtility.cs` | Markdown → HTML (Markdig) and preview line ids |

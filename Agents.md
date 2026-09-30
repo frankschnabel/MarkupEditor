@@ -20,7 +20,7 @@ The app now includes:
 - Enabling Windows shell integration also ensures `.md` is present in Explorer's per-user ShellNew cache (`HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Discardable\\PostSetup\\ShellNew\\Classes`) so the New submenu can surface the entry immediately.
 - The self-save suppression window is configurable via user setting `SelfSaveWatcherSuppressMilliseconds` (default `2000`, bounded to `0..30000`).
 - File/status indicators in the status bar.
-- User settings (live preview, word wrap, horizontal split, line numbers, allow raw HTML, editor font size, splitter distance, window size/position/state) remembered between runs via `Properties/Settings.settings`.
+- User settings (live preview, word wrap, horizontal split, line numbers, allow raw HTML, per-element font face/color/size, splitter distance, window size/position/state) remembered between runs via `Properties/Settings.settings`.
 - Split layout now preserves panel proportion during form/split-container resizes (including monitor DPI/zoom transitions) by tracking a splitter ratio and reapplying a safe clamped distance.
 - Splitter bar thickness is now set deterministically from current DPI on startup and monitor-DPI changes, preventing stale or inconsistent splitter-width scaling when moving windows between monitors.
 - The split container now re-lays out to the exact visible client area (between menu strip and status strip) on client-size and DPI changes, preventing gaps where the editor/preview area no longer fills the main window.
@@ -51,7 +51,8 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 - `MarkupEditor.Designer.cs` — declarative UI layout.
 - `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
 - `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
-- `SettingsDialog.cs` / `SettingsDialog.Designer.cs` — modal Settings dialog; exposes Live Preview, Word Wrap, Horizontal Split, Line Numbers, Allow Raw HTML, and editor font size.
+- `SettingsDialog.cs` / `SettingsDialog.Designer.cs` — modal Settings dialog with a left category list and right settings page; exposes general behavior settings and independent font face/color/size for editor text, line numbers, preview text, preview code, and each preview heading level (H1-H6).
+- `DisplayFontSettings.cs` — immutable font face, color, and size configuration used by the settings dialog and renderers.
 - `WindowsShellNewMarkdownRegistration.cs` — creates/removes per-user registry keys for the Explorer New-menu Markdown document entry.
 - `LineNumberPanel.cs` — custom `Panel` that renders logical line numbers alongside the editor; hides itself when word wrap is enabled.
 - `MarkupParser.cs` — static `MarkupParser` class; builds the Markdig pipeline and converts Markdown to an HTML body fragment.
@@ -62,6 +63,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 
 ## Coding Conventions
 - **Variable types:** Always declare an **explicit type** on the left (`StringBuilder sb`, `List<string> items`, etc.). **Do not use `var`.** On the right, prefer **target-typed `new()`** when the type is obvious: e.g. `StringBuilder sb = new()`, `MarkupEditor f = new(path)`, `_editorTextBox.Font = new(family, size, style)`. Use a full type name only when there is no left-hand type to infer from (e.g. `Application.Run(new MarkupEditor(path))`, `new object[] { ... }`). This is for new code only. Do not update existing code.
+- The application assembly declares `[SupportedOSPlatform("windows")]` in `Properties/AssemblyInfo.cs`; preserve this platform contract because the app uses Windows-only APIs and WinForms.
 - Remove unused variables, methods, etc.
 - Event handlers use the naming convention **`ControlName_Event`**: match the **Designer field name** of the control and the **event** name (e.g. `fileNew_Click`, `_editorTextBox_TextChanged`, `MarkupEditor_FormClosing` for the form). Dynamically created menu items may use a descriptive suffix (e.g. `fileRecentDocumentsEntry_Click`).
 - Prefer the BCL keyword **`object`** over **`System.Object`** for handler parameters.
@@ -91,7 +93,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 	- `FormClosing` runs the unsaved-changes prompt; if the user cancels, the close is aborted. **File → Exit** calls `Close()` so the same path runs (single prompt, no duplicate dialogs). After a successful prompt chain, the file watcher is stopped and settings are saved to `Settings.Default` via `Save()`.
 	- Document workflow methods (New, Open, Reload, Save, SaveAs).
 	- Delegates rendering to `MarkupParser` (Markdig).
-	- UI behavior (live preview toggle, word wrap, horizontal split toggle, line numbers toggle, allow raw HTML toggle, font size controls).
+	- UI behavior (live preview toggle, word wrap, horizontal split toggle, line numbers toggle, allow raw HTML toggle, and per-element font appearance settings).
 	- Optional Windows integration toggle: adds/removes Explorer `New > Markdown Document` by creating/removing `HKCU\Software\Classes\.md\ShellNew` and related ProgID keys.
 	- **File watching:** `StartWatchingFile` / `StopWatchingFile` manage a `FileSystemWatcher` on the currently open file. `_fileWatcher_ExternalChange` (background thread) sets `_externalChangePending` and marshals to the UI thread; if the form already has focus (`ContainsFocus`) the alert is shown immediately via `OnFileChangedExternally`, otherwise it is deferred until `MarkupEditor_Activated` fires.
 - `MarkupEditor.Designer.cs` builds the full UI declaratively:
@@ -105,7 +107,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 	- Menu items include:
 	  - **File**: New, Open, Recent Documents (up to 10 paths, persisted in `Settings.RecentDocuments`), Save, Save As, Print (Ctrl+P), Export submenu with PDF, TeX, and HTML (Ctrl+Shift+E) entries, Exit.
 	  - **Edit**: Undo, Redo, Cut, Copy, Paste, **Find** (Ctrl+F) and **Replace** (Ctrl+H) via `FindReplaceDialog` (match case / whole word; affects the editor pane only), Select All.
-	  - **Tools**: Render Preview and **Settings…** (Ctrl+,) — opens the `SettingsDialog`; all settings are grouped there (Live Preview, Word Wrap, Horizontal Split, Line Numbers, Allow Raw HTML in Preview, editor font size).
+	  - **Tools**: Render Preview and **Settings…** (Ctrl+,) — opens the `SettingsDialog`; categories are listed on the left, with general behavior settings and appearance settings for Editor Text, Line Numbers, Preview Text, Preview Code, and Preview Headers (individually configurable H1-H6) on the right.
 	  - **Help**: Supported Markup and About dialogs.
 
 ### Document Workflow

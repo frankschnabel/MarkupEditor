@@ -50,12 +50,23 @@ internal sealed class LineNumberPanel : Panel
     }
 
     /// <summary>
+    /// Recalculates the gutter width when its independent font changes.
+    /// </summary>
+    /// <param name="e">Font change event data.</param>
+    protected override void OnFontChanged(EventArgs e)
+    {
+        base.OnFontChanged(e);
+        UpdateWidth();
+        Invalidate();
+    }
+
+    /// <summary>
     /// Adjusts the panel width to accommodate the widest line number at the current font size.
     /// </summary>
     private void UpdateWidth()
     {
         Int32 digits = Math.Max(3, _textBox.Lines.Length.ToString().Length);
-        Int32 w = TextRenderer.MeasureText(new String('9', digits), _textBox.Font).Width + 10;
+        Int32 w = TextRenderer.MeasureText(new String('9', digits), Font).Width + 10;
         if (Width != w) Width = w;
     }
 
@@ -93,8 +104,8 @@ internal sealed class LineNumberPanel : Panel
             Rectangle rect = new(0, y, Width - 4, lineHeight);
 
             TextRenderer.DrawText(e.Graphics, (lineIndex + 1).ToString(),
-                _textBox.Font, rect, ForeColor,
-                TextFormatFlags.Right | TextFormatFlags.SingleLine);
+                Font, rect, ForeColor,
+                TextFormatFlags.Right | TextFormatFlags.SingleLine | TextFormatFlags.VerticalCenter);
         }
     }
 

@@ -3,6 +3,7 @@ using Markdig.Renderers;
 using Markdig.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -48,8 +49,12 @@ internal static class MarkupParser
     /// Wraps an HTML body fragment in a complete, styled HTML document (includes script for caret-line highlight).
     /// </summary>
     /// <param name="body">The inner HTML body content.</param>
+    /// <param name="previewText">The font settings for the preview text.</param>
+    /// <param name="previewCode">The font settings for the preview code blocks.</param>
+    /// <param name="previewHeadings">The font settings for heading levels H1 through H6.</param>
     /// <returns>A complete HTML document string ready for display in a browser control.</returns>
-    internal static String BuildHtmlDocument(String body)
+    internal static String BuildHtmlDocument(String body, DisplayFontSettings previewText,
+        DisplayFontSettings previewCode, DisplayFontSettings[] previewHeadings)
     {
         const String caretScript =
             "<script type=\"text/javascript\">" +
@@ -65,17 +70,37 @@ internal static class MarkupParser
             "else{mePreviewLastLineEl=null;}" +
             "}</script>";
 
+        String previewFont = EscapeCssFontFamily(previewText.FontFamily);
+        String codeFont = EscapeCssFontFamily(previewCode.FontFamily);
+        String previewSize = previewText.FontSize.ToString("0.##", CultureInfo.InvariantCulture);
+        String codeSize = previewCode.FontSize.ToString("0.##", CultureInfo.InvariantCulture);
+        String previewColor = ColorTranslator.ToHtml(previewText.FontColor);
+        String codeColor = ColorTranslator.ToHtml(previewCode.FontColor);
+        StringBuilder headingStyles = new();
+
+        for (Int32 index = 0; index < previewHeadings.Length; index++)
+        {
+            DisplayFontSettings heading = previewHeadings[index];
+            String headingFont = EscapeCssFontFamily(heading.FontFamily);
+            String headingSize = heading.FontSize.ToString("0.##", CultureInfo.InvariantCulture);
+            String headingColor = ColorTranslator.ToHtml(heading.FontColor);
+
+            headingStyles.Append(
+                $"h{index + 1}{{font-family:'{headingFont}',sans-serif;font-size:{headingSize}pt;color:{headingColor};}}");
+        }
+
         return "<!doctype html>\n" +
                "<html><head><meta charset=\"utf-8\">\n" +
                "<style>" +
-               "body{font-family:Segoe UI,Tahoma,sans-serif;margin:18px;color:#222;line-height:1.5;}" +
-               "h1,h2,h3,h4,h5,h6{margin:0.8em 0 0.4em;}" +
+               $"body{{font-family:'{previewFont}',sans-serif;font-size:{previewSize}pt;margin:18px;color:{previewColor};line-height:1.5;}}" +
+               headingStyles +
+               "h1,h2,h3,h4,h5,h6{margin:0.8em 0 0.4em;font-weight:bold;}" +
                "p{margin:0 0 0.8em;}" +
                "ul,ol{margin:0 0 0.8em 1.4em;padding:0;}" +
                "li{margin:0 0 0.2em;}" +
                "li.task-list-item{list-style:none;margin-left:-1.2em;}" +
-               "code{font-family:Consolas,monospace;background:#f3f3f3;padding:2px 4px;border-radius:3px;}" +
-               "pre{font-family:Consolas,monospace;background:#f3f3f3;padding:10px;border-radius:4px;overflow-x:auto;}" +
+               $"code{{font-family:'{codeFont}',monospace;font-size:{codeSize}pt;color:{codeColor};background:#f3f3f3;padding:2px 4px;border-radius:3px;}}" +
+               $"pre{{font-family:'{codeFont}',monospace;font-size:{codeSize}pt;color:{codeColor};background:#f3f3f3;padding:10px;border-radius:4px;overflow-x:auto;}}" +
                "pre code{background:transparent;padding:0;}" +
                "a{color:#0b63ce;}" +
                "hr{border:none;border-top:1px solid #ccc;margin:1.2em 0;}" +
@@ -92,6 +117,15 @@ internal static class MarkupParser
                caretScript +
                "</body></html>";
     }
+
+    /// <summary>
+    /// Escapes a font family name for a quoted CSS string.
+    /// </summary>
+    /// <param name="fontFamily">The selected font family.</param>
+    /// <returns>A CSS-safe font family value.</returns>
+    private static String EscapeCssFontFamily(String fontFamily) =>
+        (fontFamily ?? String.Empty).Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r", String.Empty)
+        .Replace("\n", String.Empty);
 
     #endregion
 
@@ -129,7 +163,8 @@ internal static class MarkupParser
     {
         if (String.IsNullOrEmpty(source)) return source;
 
-        return Regex.Replace(source, "<br\\b[^>]*>", "ME_BR_PLACEHOLDER", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        return Regex.Replace(source, "<br\\b[^>]*>", "ME_BR_PLACEHOLDER",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
 
     #endregion

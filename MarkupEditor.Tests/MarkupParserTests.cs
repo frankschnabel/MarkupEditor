@@ -135,6 +135,32 @@ public sealed class MarkupParserTests
     }
 
     /// <summary>
+    /// Preview document CSS uses the configured text and code font styles.
+    /// </summary>
+    [TestMethod]
+    public void BuildHtmlDocument_UsesConfiguredFontStyles()
+    {
+        DisplayFontSettings previewText = new("Arial", System.Drawing.ColorTranslator.FromHtml("#123456"), 13f);
+        DisplayFontSettings previewCode = new("Courier New", System.Drawing.ColorTranslator.FromHtml("#654321"), 9f);
+        DisplayFontSettings[] headings =
+        [
+            new("Arial", System.Drawing.Color.Red, 24f),
+            new("Arial", System.Drawing.Color.Green, 20f),
+            new("Arial", System.Drawing.Color.Blue, 16f),
+            new("Arial", System.Drawing.Color.Black, 12f),
+            new("Arial", System.Drawing.Color.Gray, 10f),
+            new("Arial", System.Drawing.Color.Purple, 8f)
+        ];
+        String html = MarkupParser.BuildHtmlDocument("<p>Text</p>", previewText, previewCode, headings);
+
+        StringAssert.Contains(html, "font-family:'Arial',sans-serif;font-size:13pt");
+        StringAssert.Contains(html, "font-family:'Courier New',monospace;font-size:9pt;color:#654321");
+        StringAssert.Contains(html, "color:#123456");
+        StringAssert.Contains(html, "h1{font-family:'Arial',sans-serif;font-size:24pt;color:Red;}");
+        StringAssert.Contains(html, "h6{font-family:'Arial',sans-serif;font-size:8pt;color:Purple;}");
+    }
+
+    /// <summary>
     /// HTML line-break tags render as actual line breaks even when raw HTML is otherwise escaped.
     /// </summary>
     [TestMethod]

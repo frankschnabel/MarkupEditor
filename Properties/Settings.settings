@@ -13,6 +13,35 @@
     <Setting Name="EditorFontSize" Type="System.Single" Scope="User">
       <Value Profile="(Default)">11</Value>
     </Setting>
+    <Setting Name="EditorFontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Consolas</Value></Setting>
+    <Setting Name="EditorFontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#000000</Value></Setting>
+    <Setting Name="LineNumberFontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="LineNumberFontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">9</Value></Setting>
+    <Setting Name="LineNumberFontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#6B7280</Value></Setting>
+    <Setting Name="PreviewFontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="PreviewFontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">11</Value></Setting>
+    <Setting Name="PreviewFontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
+    <Setting Name="PreviewCodeFontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Consolas</Value></Setting>
+    <Setting Name="PreviewCodeFontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">10</Value></Setting>
+    <Setting Name="PreviewCodeFontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
+    <Setting Name="PreviewH1FontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="PreviewH1FontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">22</Value></Setting>
+    <Setting Name="PreviewH1FontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
+    <Setting Name="PreviewH2FontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="PreviewH2FontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">16.5</Value></Setting>
+    <Setting Name="PreviewH2FontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
+    <Setting Name="PreviewH3FontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="PreviewH3FontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">13</Value></Setting>
+    <Setting Name="PreviewH3FontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
+    <Setting Name="PreviewH4FontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="PreviewH4FontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">11</Value></Setting>
+    <Setting Name="PreviewH4FontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
+    <Setting Name="PreviewH5FontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="PreviewH5FontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">9</Value></Setting>
+    <Setting Name="PreviewH5FontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
+    <Setting Name="PreviewH6FontFamily" Type="System.String" Scope="User"><Value Profile="(Default)">Segoe UI</Value></Setting>
+    <Setting Name="PreviewH6FontSize" Type="System.Single" Scope="User"><Value Profile="(Default)">7.5</Value></Setting>
+    <Setting Name="PreviewH6FontColor" Type="System.String" Scope="User"><Value Profile="(Default)">#222222</Value></Setting>
     <Setting Name="SplitterDistance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">480</Value>
     </Setting>

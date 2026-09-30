@@ -39,6 +39,21 @@ internal sealed partial class MarkupEditor : Form
     private Boolean _previewReady;
     private Boolean _allowRawHtml;
     private Boolean _windowsNewMarkdownDocument;
+    private DisplayFontSettings _editorFontSettings = new("Consolas", Color.Black, 11f);
+    private DisplayFontSettings _lineNumberFontSettings = new("Segoe UI", Color.Gray, 9f);
+    private DisplayFontSettings _previewFontSettings = new("Segoe UI", Color.FromArgb(34, 34, 34), 11f);
+    private DisplayFontSettings _previewCodeFontSettings = new("Consolas", Color.FromArgb(34, 34, 34), 10f);
+
+    private DisplayFontSettings[] _previewHeadingFontSettings =
+    [
+        new("Segoe UI", Color.FromArgb(34, 34, 34), 22f),
+        new("Segoe UI", Color.FromArgb(34, 34, 34), 16.5f),
+        new("Segoe UI", Color.FromArgb(34, 34, 34), 13f),
+        new("Segoe UI", Color.FromArgb(34, 34, 34), 11f),
+        new("Segoe UI", Color.FromArgb(34, 34, 34), 9f),
+        new("Segoe UI", Color.FromArgb(34, 34, 34), 7.5f)
+    ];
+
     private Int32 _selfSaveWatcherSuppressMilliseconds = SelfSaveWatcherSuppressMillisecondsDefault;
     private Int32 _pendingPreviewScrollLine = -1;
     private Boolean _pendingPrintAfterRender;
@@ -582,9 +597,39 @@ internal sealed partial class MarkupEditor : Form
         _editorTextBox.WordWrap = s.WordWrap;
         _editorTextBox.ScrollBars = _editorTextBox.WordWrap ? ScrollBars.Vertical : ScrollBars.Both;
 
-        Single fontSize = s.EditorFontSize;
-        fontSize = Math.Max(8f, Math.Min(28f, fontSize));
-        _editorTextBox.Font = new Font(_editorTextBox.Font.FontFamily, fontSize, _editorTextBox.Font.Style);
+        _editorFontSettings =
+            CreateStoredFontSettings(s.EditorFontFamily, s.EditorFontColor,
+                s.EditorFontSize, "Consolas", Color.Black, 11f);
+
+        _lineNumberFontSettings =
+            CreateStoredFontSettings(s.LineNumberFontFamily, s.LineNumberFontColor,
+                s.LineNumberFontSize, "Segoe UI", Color.Gray, 9f);
+
+        _previewFontSettings =
+            CreateStoredFontSettings(s.PreviewFontFamily, s.PreviewFontColor,
+                s.PreviewFontSize, "Segoe UI", Color.FromArgb(34, 34, 34), 11f);
+
+        _previewCodeFontSettings =
+            CreateStoredFontSettings(s.PreviewCodeFontFamily, s.PreviewCodeFontColor,
+                s.PreviewCodeFontSize, "Consolas", Color.FromArgb(34, 34, 34), 10f);
+
+        _previewHeadingFontSettings =
+        [
+            CreateStoredFontSettings(s.PreviewH1FontFamily, s.PreviewH1FontColor, s.PreviewH1FontSize,
+                "Segoe UI", Color.FromArgb(34, 34, 34), 22f),
+            CreateStoredFontSettings(s.PreviewH2FontFamily, s.PreviewH2FontColor, s.PreviewH2FontSize,
+                "Segoe UI", Color.FromArgb(34, 34, 34), 16.5f),
+            CreateStoredFontSettings(s.PreviewH3FontFamily, s.PreviewH3FontColor, s.PreviewH3FontSize,
+                "Segoe UI", Color.FromArgb(34, 34, 34), 13f),
+            CreateStoredFontSettings(s.PreviewH4FontFamily, s.PreviewH4FontColor, s.PreviewH4FontSize,
+                "Segoe UI", Color.FromArgb(34, 34, 34), 11f),
+            CreateStoredFontSettings(s.PreviewH5FontFamily, s.PreviewH5FontColor, s.PreviewH5FontSize,
+                "Segoe UI", Color.FromArgb(34, 34, 34), 9f),
+            CreateStoredFontSettings(s.PreviewH6FontFamily, s.PreviewH6FontColor, s.PreviewH6FontSize,
+                "Segoe UI", Color.FromArgb(34, 34, 34), 7.5f)
+        ];
+
+        ApplyDisplayFontSettings();
 
         Boolean horizontalSplit = s.HorizontalSplit;
         _mainSplit.Orientation = horizontalSplit ? Orientation.Horizontal : Orientation.Vertical;
@@ -636,7 +681,36 @@ internal sealed partial class MarkupEditor : Form
         Settings s = Settings.Default;
         s.LivePreviewEnabled = _livePreviewEnabled;
         s.WordWrap = _editorTextBox.WordWrap;
-        s.EditorFontSize = _editorTextBox.Font.Size;
+        s.EditorFontSize = _editorFontSettings.FontSize;
+        s.EditorFontFamily = _editorFontSettings.FontFamily;
+        s.EditorFontColor = ColorTranslator.ToHtml(_editorFontSettings.FontColor);
+        s.LineNumberFontFamily = _lineNumberFontSettings.FontFamily;
+        s.LineNumberFontSize = _lineNumberFontSettings.FontSize;
+        s.LineNumberFontColor = ColorTranslator.ToHtml(_lineNumberFontSettings.FontColor);
+        s.PreviewFontFamily = _previewFontSettings.FontFamily;
+        s.PreviewFontSize = _previewFontSettings.FontSize;
+        s.PreviewFontColor = ColorTranslator.ToHtml(_previewFontSettings.FontColor);
+        s.PreviewCodeFontFamily = _previewCodeFontSettings.FontFamily;
+        s.PreviewCodeFontSize = _previewCodeFontSettings.FontSize;
+        s.PreviewCodeFontColor = ColorTranslator.ToHtml(_previewCodeFontSettings.FontColor);
+        s.PreviewH1FontFamily = _previewHeadingFontSettings[0].FontFamily;
+        s.PreviewH1FontSize = _previewHeadingFontSettings[0].FontSize;
+        s.PreviewH1FontColor = ColorTranslator.ToHtml(_previewHeadingFontSettings[0].FontColor);
+        s.PreviewH2FontFamily = _previewHeadingFontSettings[1].FontFamily;
+        s.PreviewH2FontSize = _previewHeadingFontSettings[1].FontSize;
+        s.PreviewH2FontColor = ColorTranslator.ToHtml(_previewHeadingFontSettings[1].FontColor);
+        s.PreviewH3FontFamily = _previewHeadingFontSettings[2].FontFamily;
+        s.PreviewH3FontSize = _previewHeadingFontSettings[2].FontSize;
+        s.PreviewH3FontColor = ColorTranslator.ToHtml(_previewHeadingFontSettings[2].FontColor);
+        s.PreviewH4FontFamily = _previewHeadingFontSettings[3].FontFamily;
+        s.PreviewH4FontSize = _previewHeadingFontSettings[3].FontSize;
+        s.PreviewH4FontColor = ColorTranslator.ToHtml(_previewHeadingFontSettings[3].FontColor);
+        s.PreviewH5FontFamily = _previewHeadingFontSettings[4].FontFamily;
+        s.PreviewH5FontSize = _previewHeadingFontSettings[4].FontSize;
+        s.PreviewH5FontColor = ColorTranslator.ToHtml(_previewHeadingFontSettings[4].FontColor);
+        s.PreviewH6FontFamily = _previewHeadingFontSettings[5].FontFamily;
+        s.PreviewH6FontSize = _previewHeadingFontSettings[5].FontSize;
+        s.PreviewH6FontColor = ColorTranslator.ToHtml(_previewHeadingFontSettings[5].FontColor);
         s.HorizontalSplit = _mainSplit.Orientation == Orientation.Horizontal;
         s.ShowLineNumbers = _lineNumberPanel.Visible;
         s.AllowRawHtml = _allowRawHtml;
@@ -652,6 +726,45 @@ internal sealed partial class MarkupEditor : Form
         s.SplitterDistance = GetSplitterDistanceForPersistedWindowBounds(s.MainWindowBounds);
 
         s.Save();
+    }
+
+    /// <summary>
+    /// Loads a saved font style while recovering from invalid or unavailable values.
+    /// </summary>
+    private static DisplayFontSettings CreateStoredFontSettings(String family, String color, Single size,
+        String fallbackFamily, Color fallbackColor, Single fallbackSize)
+    {
+        Boolean familyExists =
+            FontFamily.Families.Any(font =>
+                String.Equals(font.Name, family, StringComparison.OrdinalIgnoreCase));
+
+        Color parsedColor = fallbackColor;
+
+        try
+        {
+            parsedColor = ColorTranslator.FromHtml(color);
+        }
+        catch (ArgumentException)
+        {
+        }
+
+        return new DisplayFontSettings(familyExists ? family : fallbackFamily, parsedColor,
+            Single.IsNaN(size) || Single.IsInfinity(size) ? fallbackSize : Math.Max(6f, Math.Min(36f, size)));
+    }
+
+    /// <summary>
+    /// Applies the current editor and line-number font settings to their WinForms controls.
+    /// </summary>
+    private void ApplyDisplayFontSettings()
+    {
+        _editorTextBox.Font = new Font(_editorFontSettings.FontFamily, _editorFontSettings.FontSize, FontStyle.Regular);
+        _editorTextBox.ForeColor = _editorFontSettings.FontColor;
+
+        _lineNumberPanel.Font =
+            new Font(_lineNumberFontSettings.FontFamily, _lineNumberFontSettings.FontSize, FontStyle.Regular);
+
+        _lineNumberPanel.ForeColor = _lineNumberFontSettings.FontColor;
+        _lineNumberPanel.Invalidate();
     }
 
     /// <summary>
@@ -851,8 +964,12 @@ internal sealed partial class MarkupEditor : Form
 
         if (paths.Count == 0)
         {
-            ToolStripMenuItem placeholder = new("(No recent documents)");
-            placeholder.Enabled = false;
+            ToolStripMenuItem placeholder =
+                new("(No recent documents)")
+                {
+                    Enabled = false
+                };
+
             fileRecentDocuments.DropDownItems.Add(placeholder);
 
             return;
@@ -860,10 +977,14 @@ internal sealed partial class MarkupEditor : Form
 
         foreach (String fullPath in paths)
         {
-            ToolStripMenuItem entry = new(FormatRecentMenuCaption(fullPath));
-            entry.Tag = fullPath;
-            entry.ToolTipText = fullPath;
-            entry.Enabled = File.Exists(fullPath);
+            ToolStripMenuItem entry =
+                new(FormatRecentMenuCaption(fullPath))
+                {
+                    Tag = fullPath,
+                    ToolTipText = fullPath,
+                    Enabled = File.Exists(fullPath)
+                };
+
             entry.Click += fileRecentDocumentsEntry_Click;
             fileRecentDocuments.DropDownItems.Add(entry);
         }
@@ -1178,7 +1299,11 @@ internal sealed partial class MarkupEditor : Form
                 _lineNumberPanel.Visible,
                 _allowRawHtml,
                 _windowsNewMarkdownDocument,
-                _editorTextBox.Font.Size);
+                [
+                    _editorFontSettings, _lineNumberFontSettings, _previewFontSettings, _previewCodeFontSettings,
+                    _previewHeadingFontSettings[0], _previewHeadingFontSettings[1], _previewHeadingFontSettings[2],
+                    _previewHeadingFontSettings[3], _previewHeadingFontSettings[4], _previewHeadingFontSettings[5]
+                ]);
 
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
 
@@ -1219,14 +1344,17 @@ internal sealed partial class MarkupEditor : Form
         Boolean windowsNewMarkdownChanged = _windowsNewMarkdownDocument != dialog.WindowsNewMarkdownDocument;
         _windowsNewMarkdownDocument = dialog.WindowsNewMarkdownDocument;
 
-        Single newFontSize = dialog.FontSize;
-
-        if (Math.Abs(newFontSize - _editorTextBox.Font.Size) > 0.01f)
-            _editorTextBox.Font = new Font(_editorTextBox.Font.FontFamily, newFontSize, _editorTextBox.Font.Style);
+        DisplayFontSettings[] fontSettings = dialog.FontSettings;
+        _editorFontSettings = fontSettings[0];
+        _lineNumberFontSettings = fontSettings[1];
+        _previewFontSettings = fontSettings[2];
+        _previewCodeFontSettings = fontSettings[3];
+        _previewHeadingFontSettings = fontSettings[4..10];
+        ApplyDisplayFontSettings();
 
         if (windowsNewMarkdownChanged) ApplyWindowsNewMarkdownRegistration();
 
-        if (allowRawHtmlChanged) DoRenderPreview();
+        if (allowRawHtmlChanged || _previewReady) DoRenderPreview();
     }
 
     /// <summary>
@@ -1394,7 +1522,8 @@ internal sealed partial class MarkupEditor : Form
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
 
         String html =
-            MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml));
+            MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml),
+                _previewFontSettings, _previewCodeFontSettings, _previewHeadingFontSettings);
 
         try
         {
@@ -1496,7 +1625,8 @@ internal sealed partial class MarkupEditor : Form
         _pendingPreviewScrollLine = scrollLine;
 
         String html =
-            MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml));
+            MarkupParser.BuildHtmlDocument(MarkupParser.ConvertMarkupToHtml(_editorTextBox.Text, _allowRawHtml),
+                _previewFontSettings, _previewCodeFontSettings, _previewHeadingFontSettings);
 
         _previewBrowser.NavigateToString(html);
     }
