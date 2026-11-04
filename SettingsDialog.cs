@@ -21,6 +21,8 @@ internal sealed partial class SettingsDialog : Form
     private readonly CheckBox _wordWrapCheckBox = new();
     private readonly CheckBox _horizontalSplitCheckBox = new();
     private readonly CheckBox _showLineNumbersCheckBox = new();
+    private readonly CheckBox _syncPreviewScrollCheckBox = new();
+    private readonly CheckBox _highlightPreviewLineCheckBox = new();
     private readonly CheckBox _allowRawHtmlCheckBox = new();
     private readonly CheckBox _windowsNewMarkdownDocumentCheckBox = new();
     private readonly Label _headingLevelLabel = new();
@@ -37,18 +39,21 @@ internal sealed partial class SettingsDialog : Form
     /// <param name="wordWrap">Whether word wrap is currently enabled.</param>
     /// <param name="horizontalSplit">Whether horizontal split is currently active.</param>
     /// <param name="showLineNumbers">Whether the line number gutter is visible.</param>
+    /// <param name="syncPreviewScroll">Whether the preview scrolls to the caret line.</param>
+    /// <param name="highlightPreviewLine">Whether the preview highlights the caret line.</param>
     /// <param name="allowRawHtml">Whether raw HTML passthrough is enabled in the preview.</param>
     /// <param name="windowsNewMarkdownDocument">Whether Windows New/Markdown Document integration is enabled.</param>
     /// <param name="fontSettings">Appearance settings for editor, gutter, preview text, code, and H1-H6 headings.</param>
     public SettingsDialog(Boolean livePreview, Boolean wordWrap, Boolean horizontalSplit, Boolean showLineNumbers,
-        Boolean allowRawHtml, Boolean windowsNewMarkdownDocument, DisplayFontSettings[] fontSettings)
+        Boolean syncPreviewScroll, Boolean highlightPreviewLine, Boolean allowRawHtml,
+        Boolean windowsNewMarkdownDocument, DisplayFontSettings[] fontSettings)
     {
         InitializeComponent();
 
         _fontSettings = (DisplayFontSettings[])fontSettings.Clone();
 
-        InitializeGeneralPage(livePreview, wordWrap, horizontalSplit, showLineNumbers, allowRawHtml,
-            windowsNewMarkdownDocument);
+        InitializeGeneralPage(livePreview, wordWrap, horizontalSplit, showLineNumbers, syncPreviewScroll,
+            highlightPreviewLine, allowRawHtml, windowsNewMarkdownDocument);
 
         InitializeFontControls();
         _categoriesListBox.SelectedIndexChanged += _categoriesListBox_SelectedIndexChanged;
@@ -66,6 +71,12 @@ internal sealed partial class SettingsDialog : Form
 
     /// <summary>Gets the show line numbers setting chosen by the user.</summary>
     public Boolean ShowLineNumbers => _showLineNumbersCheckBox.Checked;
+
+    /// <summary>Gets whether preview scrolling to the caret line is enabled.</summary>
+    public Boolean SyncPreviewScroll => _syncPreviewScrollCheckBox.Checked;
+
+    /// <summary>Gets whether preview highlighting of the caret line is enabled.</summary>
+    public Boolean HighlightPreviewLine => _highlightPreviewLineCheckBox.Checked;
 
     /// <summary>Gets the allow raw HTML setting chosen by the user.</summary>
     public Boolean AllowRawHtml => _allowRawHtmlCheckBox.Checked;
@@ -88,23 +99,28 @@ internal sealed partial class SettingsDialog : Form
     /// Adds general behavior settings to the General category page.
     /// </summary>
     private void InitializeGeneralPage(Boolean livePreview, Boolean wordWrap, Boolean horizontalSplit,
-        Boolean showLineNumbers, Boolean allowRawHtml, Boolean windowsNewMarkdownDocument)
+        Boolean showLineNumbers, Boolean syncPreviewScroll, Boolean highlightPreviewLine, Boolean allowRawHtml,
+        Boolean windowsNewMarkdownDocument)
     {
         _livePreviewCheckBox.Text = "Live Preview";
         _wordWrapCheckBox.Text = "Word Wrap";
         _horizontalSplitCheckBox.Text = "Horizontal Split";
         _showLineNumbersCheckBox.Text = "Show Line Numbers";
+        _syncPreviewScrollCheckBox.Text = "Scroll Preview to Caret";
+        _highlightPreviewLineCheckBox.Text = "Highlight Current Line in Preview";
         _allowRawHtmlCheckBox.Text = "Allow Raw HTML in Preview";
         _windowsNewMarkdownDocumentCheckBox.Text = "Add \"New > Markdown Document\" menu entry";
 
         CheckBox[] checkBoxes =
         [
             _livePreviewCheckBox, _wordWrapCheckBox, _horizontalSplitCheckBox,
-            _showLineNumbersCheckBox, _allowRawHtmlCheckBox, _windowsNewMarkdownDocumentCheckBox
+            _showLineNumbersCheckBox, _syncPreviewScrollCheckBox, _highlightPreviewLineCheckBox,
+            _allowRawHtmlCheckBox, _windowsNewMarkdownDocumentCheckBox
         ];
 
         Boolean[] values =
-            [livePreview, wordWrap, horizontalSplit, showLineNumbers, allowRawHtml, windowsNewMarkdownDocument];
+            [livePreview, wordWrap, horizontalSplit, showLineNumbers, syncPreviewScroll, highlightPreviewLine,
+                allowRawHtml, windowsNewMarkdownDocument];
 
         for (Int32 index = 0; index < checkBoxes.Length; index++)
         {

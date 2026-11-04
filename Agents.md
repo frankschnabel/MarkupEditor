@@ -51,7 +51,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 - `MarkupEditor.Designer.cs` — declarative UI layout.
 - `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
 - `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
-- `SettingsDialog.cs` / `SettingsDialog.Designer.cs` — modal Settings dialog with a left category list and right settings page; exposes general behavior settings and independent font face/color/size for editor text, line numbers, preview text, preview code, and each preview heading level (H1-H6).
+- `SettingsDialog.cs` / `SettingsDialog.Designer.cs` — modal Settings dialog with a left category list and right settings page; exposes general behavior settings, independent preview caret scrolling/highlighting options, and independent font face/color/size for editor text, line numbers, preview text, preview code, and each preview heading level (H1-H6).
 - `DisplayFontSettings.cs` — immutable font face, color, and size configuration used by the settings dialog and renderers.
 - `WindowsShellNewMarkdownRegistration.cs` — creates/removes per-user registry keys for the Explorer New-menu Markdown document entry.
 - `LineNumberPanel.cs` — custom `Panel` that renders logical line numbers alongside the editor; hides itself when word wrap is enabled.
@@ -107,7 +107,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 	- Menu items include:
 	  - **File**: New, Open, Recent Documents (up to 10 paths, persisted in `Settings.RecentDocuments`), Save, Save As, Print (Ctrl+P), Export submenu with PDF, TeX, and HTML (Ctrl+Shift+E) entries, Exit.
 	  - **Edit**: Undo, Redo, Cut, Copy, Paste, **Find** (Ctrl+F) and **Replace** (Ctrl+H) via `FindReplaceDialog` (match case / whole word; affects the editor pane only), Select All.
-	  - **Tools**: Render Preview and **Settings…** (Ctrl+,) — opens the `SettingsDialog`; categories are listed on the left, with general behavior settings and appearance settings for Editor Text, Line Numbers, Preview Text, Preview Code, and Preview Headers (individually configurable H1-H6) on the right.
+	  - **Tools**: Render Preview (F5), Scroll to Current Line (F6), and **Settings…** (Ctrl+,) — opens the `SettingsDialog`; categories are listed on the left, with general behavior settings including independent preview caret scrolling/highlighting options and appearance settings for Editor Text, Line Numbers, Preview Text, Preview Code, and Preview Headers (individually configurable H1-H6) on the right.
 	  - **Help**: Supported Markup and About dialogs.
 
 ### Document Workflow
@@ -123,8 +123,8 @@ Implemented with **Markdig** in `MarkupParser` / `PreviewLineAnchorUtility`:
 1. `ConvertMarkupToHtml` normalizes line endings, parses the document with the configured pipeline (pipe/grid tables, task lists, autolinks, emphasis extras/strikethrough, footnotes; **DisableHtml** for safe preview unless `allowHtml` is `true`).
 2. `PreviewLineAnchorUtility.AssignPreviewLineAnchors` sets `id="me-line-{n}"` on the **first** block starting on each source line `n` (0-based), skipping link reference definitions and the document root.
 3. `HtmlRenderer` writes the HTML body fragment.
-4. `BuildHtmlDocument` wraps the body in a styled HTML document and injects `MarkupSetActiveLine(n)` (clears the previously highlighted element, then finds the nearest `me-line-*` at or above `n`, scrolls it into view, and highlights it with a light-amber background).
-5. After each preview update and on caret moves (key/mouse), the host calls `SyncPreviewToCaretLine` → `TryInvokePreviewActiveLineHighlight`, which executes `MarkupSetActiveLine(n)` via `WebView2.ExecuteScriptAsync`. Deferred work uses `BeginInvoke` / `HandleCreated` where needed so startup via file association does not throw.
+4. `BuildHtmlDocument` wraps the body in a styled HTML document and injects `MarkupSetActiveLine(n, scrollToLine, highlightLine)`, which independently scrolls and highlights the nearest `me-line-*` at or above `n`.
+5. After each preview update and on caret moves (key/mouse), the host calls `SyncPreviewToCaretLine` → `TryInvokePreviewLineAction`, which executes `MarkupSetActiveLine` via `WebView2.ExecuteScriptAsync`. When caret scrolling is disabled, same-document refreshes preserve the current preview scroll offset; New/Open renders start at the top. Deferred work uses `BeginInvoke` / `HandleCreated` where needed so startup via file association does not throw.
 
 ## Build and Run
 Environment assumptions:

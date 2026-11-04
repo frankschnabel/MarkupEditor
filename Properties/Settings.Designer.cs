@@ -336,6 +336,36 @@ namespace MarkupEditor.Properties
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SyncPreviewScroll
+        {
+            get
+            {
+                return ((bool)(this["SyncPreviewScroll"]));
+            }
+            set
+            {
+                this["SyncPreviewScroll"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool HighlightPreviewLine
+        {
+            get
+            {
+                return ((bool)(this["HighlightPreviewLine"]));
+            }
+            set
+            {
+                this["HighlightPreviewLine"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2000")]
         public int SelfSaveWatcherSuppressMilliseconds
         {

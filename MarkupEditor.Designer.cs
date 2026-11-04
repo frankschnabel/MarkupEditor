@@ -61,6 +61,7 @@ namespace MarkupEditor
             editSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             toolsMenu = new System.Windows.Forms.ToolStripMenuItem();
             toolsRender = new System.Windows.Forms.ToolStripMenuItem();
+            toolsScrollToCurrentLine = new System.Windows.Forms.ToolStripMenuItem();
             toolsSep = new System.Windows.Forms.ToolStripSeparator();
             toolsSettings = new System.Windows.Forms.ToolStripMenuItem();
             helpMenu = new System.Windows.Forms.ToolStripMenuItem();
@@ -294,7 +295,7 @@ namespace MarkupEditor
             // 
             // toolsMenu
             // 
-            toolsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolsRender, toolsSep, toolsSettings });
+            toolsMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolsRender, toolsScrollToCurrentLine, toolsSep, toolsSettings });
             toolsMenu.Name = "toolsMenu";
             toolsMenu.Size = new System.Drawing.Size(47, 20);
             toolsMenu.Text = "&Tools";
@@ -306,6 +307,14 @@ namespace MarkupEditor
             toolsRender.Size = new System.Drawing.Size(174, 22);
             toolsRender.Text = "&Render Preview";
             toolsRender.Click += toolsRender_Click;
+            //
+            // toolsScrollToCurrentLine
+            //
+            toolsScrollToCurrentLine.Name = "toolsScrollToCurrentLine";
+            toolsScrollToCurrentLine.ShortcutKeys = System.Windows.Forms.Keys.F6;
+            toolsScrollToCurrentLine.Size = new System.Drawing.Size(205, 22);
+            toolsScrollToCurrentLine.Text = "Scroll to Current Line";
+            toolsScrollToCurrentLine.Click += toolsScrollToCurrentLine_Click;
             // 
             // toolsSep
             // 
@@ -489,6 +498,7 @@ namespace MarkupEditor
         private System.Windows.Forms.ToolStripMenuItem editSelectAll;
         private System.Windows.Forms.ToolStripMenuItem toolsMenu;
         private System.Windows.Forms.ToolStripMenuItem toolsRender;
+        private System.Windows.Forms.ToolStripMenuItem toolsScrollToCurrentLine;
         private System.Windows.Forms.ToolStripSeparator toolsSep;
         private System.Windows.Forms.ToolStripMenuItem toolsSettings;
         private System.Windows.Forms.ToolStripMenuItem helpMenu;

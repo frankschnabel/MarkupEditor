@@ -46,7 +46,7 @@ internal static class MarkupParser
             .Build();
 
     /// <summary>
-    /// Wraps an HTML body fragment in a complete, styled HTML document (includes script for caret-line highlight).
+    /// Wraps an HTML body fragment in a complete, styled HTML document (includes script for caret-line synchronization).
     /// </summary>
     /// <param name="body">The inner HTML body content.</param>
     /// <param name="previewText">The font settings for the preview text.</param>
@@ -59,15 +59,16 @@ internal static class MarkupParser
         const String caretScript =
             "<script type=\"text/javascript\">" +
             "var mePreviewLastLineEl=null;" +
-            "function MarkupSetActiveLine(n){" +
+            "function MarkupSetActiveLine(n,scrollToLine,highlightLine){" +
             "if(mePreviewLastLineEl){mePreviewLastLineEl.style.backgroundColor=\"\";mePreviewLastLineEl.style.borderRadius=\"\";}" +
+            "mePreviewLastLineEl=null;" +
+            "if(!scrollToLine&&!highlightLine)return;" +
             "var t=null;" +
             "for(var i=n;i>=0;i--){" +
             "t=document.getElementById(\"me-line-\"+i);" +
             "if(t)break;" +
             "}" +
-            "if(t){t.scrollIntoView(true);t.style.backgroundColor=\"#fff3cd\";t.style.borderRadius=\"4px\";mePreviewLastLineEl=t;}" +
-            "else{mePreviewLastLineEl=null;}" +
+            "if(t){if(scrollToLine)t.scrollIntoView(true);if(highlightLine){t.style.backgroundColor=\"#fff3cd\";t.style.borderRadius=\"4px\";mePreviewLastLineEl=t;}}" +
             "}</script>";
 
         String previewFont = EscapeCssFontFamily(previewText.FontFamily);

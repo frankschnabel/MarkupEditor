@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 // ReSharper disable once RedundantUsingDirective
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -37,6 +38,8 @@ internal sealed partial class MarkupEditor : Form
     private Boolean _suppressDirtyFlag;
     private Boolean _livePreviewEnabled;
     private Boolean _previewReady;
+    private Boolean _syncPreviewScroll = true;
+    private Boolean _highlightPreviewLine = true;
     private Boolean _allowRawHtml;
     private Boolean _windowsNewMarkdownDocument;
     private DisplayFontSettings _editorFontSettings = new("Consolas", Color.Black, 11f);
@@ -56,6 +59,8 @@ internal sealed partial class MarkupEditor : Form
 
     private Int32 _selfSaveWatcherSuppressMilliseconds = SelfSaveWatcherSuppressMillisecondsDefault;
     private Int32 _pendingPreviewScrollLine = -1;
+    private Int32 _previewRenderVersion;
+    private Double? _pendingPreviewScrollOffset;
     private Boolean _pendingPrintAfterRender;
     private String _pendingPdfExportPath;
     private Double _splitterDistanceRatio = 0.5d;
@@ -360,6 +365,22 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     private void _previewBrowser_NavigationCompleted(Object sender, CoreWebView2NavigationCompletedEventArgs e)
     {
+        if (_pendingPreviewScrollOffset.HasValue)
+        {
+            Double scrollOffset = _pendingPreviewScrollOffset.Value;
+            _pendingPreviewScrollOffset = null;
+
+            try
+            {
+                _ = _previewBrowser.ExecuteScriptAsync(
+                    $"window.scrollTo(0,{scrollOffset.ToString(CultureInfo.InvariantCulture)})");
+            }
+            catch (InvalidOperationException)
+            {
+                // WebView2 not ready for scripting.
+            }
+        }
+
         if (_pendingPreviewScrollLine >= 0)
         {
             Int32 line = _pendingPreviewScrollLine;
@@ -423,19 +444,24 @@ internal sealed partial class MarkupEditor : Form
     /// </summary>
     /// <param name="editorLineIndex">Zero-based source line index.</param>
     private void SyncPreviewToCaretLine(Int32 editorLineIndex) =>
-        TryInvokePreviewActiveLineHighlight(editorLineIndex);
+        TryInvokePreviewLineAction(editorLineIndex, _syncPreviewScroll, _highlightPreviewLine);
 
     /// <summary>
-    /// Calls the preview script to scroll to and highlight the block for the given source line.
+    /// Calls the preview script to apply the requested scroll and highlight behavior to a source line.
     /// </summary>
     /// <param name="editorLineIndex">Zero-based source line index.</param>
-    private void TryInvokePreviewActiveLineHighlight(Int32 editorLineIndex)
+    /// <param name="scrollToLine">Whether the preview should scroll to the line.</param>
+    /// <param name="highlightLine">Whether the preview should highlight the line.</param>
+    private void TryInvokePreviewLineAction(Int32 editorLineIndex, Boolean scrollToLine, Boolean highlightLine)
     {
         if (!_previewReady || editorLineIndex < 0) return;
 
         try
         {
-            _ = _previewBrowser.ExecuteScriptAsync($"MarkupSetActiveLine({editorLineIndex})");
+            String scrollScriptValue = scrollToLine ? "true" : "false";
+            String highlightScriptValue = highlightLine ? "true" : "false";
+            _ = _previewBrowser.ExecuteScriptAsync(
+                $"MarkupSetActiveLine({editorLineIndex},{scrollScriptValue},{highlightScriptValue})");
         }
         catch (InvalidOperationException)
         {
@@ -593,6 +619,8 @@ internal sealed partial class MarkupEditor : Form
     {
         Settings s = Settings.Default;
         _livePreviewEnabled = s.LivePreviewEnabled;
+        _syncPreviewScroll = s.SyncPreviewScroll;
+        _highlightPreviewLine = s.HighlightPreviewLine;
 
         _editorTextBox.WordWrap = s.WordWrap;
         _editorTextBox.ScrollBars = _editorTextBox.WordWrap ? ScrollBars.Vertical : ScrollBars.Both;
@@ -680,6 +708,8 @@ internal sealed partial class MarkupEditor : Form
     {
         Settings s = Settings.Default;
         s.LivePreviewEnabled = _livePreviewEnabled;
+        s.SyncPreviewScroll = _syncPreviewScroll;
+        s.HighlightPreviewLine = _highlightPreviewLine;
         s.WordWrap = _editorTextBox.WordWrap;
         s.EditorFontSize = _editorFontSettings.FontSize;
         s.EditorFontFamily = _editorFontSettings.FontFamily;
@@ -875,7 +905,7 @@ internal sealed partial class MarkupEditor : Form
 
         _currentFilePath = null;
         _isDirty = false;
-        DoRenderPreview();
+        DoRenderPreview(false);
         UpdateWindowState();
     }
 
@@ -1127,7 +1157,7 @@ internal sealed partial class MarkupEditor : Form
 
             _currentFilePath = fullPath;
             _isDirty = false;
-            DoRenderPreview();
+            DoRenderPreview(false);
             UpdateWindowState();
             RememberRecentDocument(fullPath);
             StartWatchingFile(fullPath);
@@ -1286,6 +1316,10 @@ internal sealed partial class MarkupEditor : Form
     /// <summary>Manually triggers a preview render from the Tools menu (Render Preview).</summary>
     private void toolsRender_Click(Object sender, EventArgs args) => DoRenderPreview();
 
+    /// <summary>Scrolls the preview to the editor's current caret line.</summary>
+    private void toolsScrollToCurrentLine_Click(Object sender, EventArgs args) =>
+        TryInvokePreviewLineAction(GetEditorCaretLine(), true, _highlightPreviewLine);
+
     /// <summary>
     /// Opens the Settings dialog; applies accepted changes immediately.
     /// </summary>
@@ -1297,6 +1331,8 @@ internal sealed partial class MarkupEditor : Form
                 _editorTextBox.WordWrap,
                 _mainSplit.Orientation == Orientation.Horizontal,
                 _lineNumberPanel.Visible,
+                _syncPreviewScroll,
+                _highlightPreviewLine,
                 _allowRawHtml,
                 _windowsNewMarkdownDocument,
                 [
@@ -1337,6 +1373,8 @@ internal sealed partial class MarkupEditor : Form
             ApplySplitOrientation(newHorizontal);
 
         _lineNumberPanel.Visible = dialog.ShowLineNumbers;
+        _syncPreviewScroll = dialog.SyncPreviewScroll;
+        _highlightPreviewLine = dialog.HighlightPreviewLine;
 
         Boolean allowRawHtmlChanged = _allowRawHtml != dialog.AllowRawHtml;
         _allowRawHtml = dialog.AllowRawHtml;
@@ -1617,11 +1655,20 @@ internal sealed partial class MarkupEditor : Form
     /// Converts the editor text to HTML and displays it in the preview browser.
     /// Does nothing if the WebView2 browser is not yet initialized.
     /// </summary>
-    private void DoRenderPreview()
+    /// <param name="preserveScrollPosition">Whether to restore the current viewport when caret scrolling is disabled.</param>
+    private async void DoRenderPreview(Boolean preserveScrollPosition = true)
     {
         if (!_previewReady) return;
 
+        Int32 renderVersion = ++_previewRenderVersion;
         Int32 scrollLine = GetEditorCaretLine();
+        Double? scrollOffset = preserveScrollPosition && !_syncPreviewScroll
+            ? await GetPreviewScrollOffsetAsync()
+            : null;
+
+        if (renderVersion != _previewRenderVersion) return;
+
+        _pendingPreviewScrollOffset = scrollOffset;
         _pendingPreviewScrollLine = scrollLine;
 
         String html =
@@ -1629,6 +1676,28 @@ internal sealed partial class MarkupEditor : Form
                 _previewFontSettings, _previewCodeFontSettings, _previewHeadingFontSettings);
 
         _previewBrowser.NavigateToString(html);
+    }
+
+    /// <summary>
+    /// Gets the current preview scroll offset so it can be restored after replacing the document.
+    /// </summary>
+    /// <returns>The scroll offset, or <see langword="null"/> if it cannot be read.</returns>
+    private async Task<Double?> GetPreviewScrollOffsetAsync()
+    {
+        try
+        {
+            String scrollOffset = await _previewBrowser.ExecuteScriptAsync("window.scrollY");
+
+            if (Double.TryParse(scrollOffset, NumberStyles.Float, CultureInfo.InvariantCulture,
+                    out Double parsedOffset))
+                return parsedOffset;
+        }
+        catch (InvalidOperationException)
+        {
+            // WebView2 not ready for scripting.
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -66,6 +66,12 @@
     <Setting Name="ShowLineNumbers" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="SyncPreviewScroll" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="HighlightPreviewLine" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
     <Setting Name="SelfSaveWatcherSuppressMilliseconds" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2000</Value>
     </Setting>
