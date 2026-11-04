@@ -67,7 +67,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 - Remove unused variables, methods, etc.
 - Event handlers use the naming convention **`ControlName_Event`**: match the **Designer field name** of the control and the **event** name (e.g. `fileNew_Click`, `_editorTextBox_TextChanged`, `MarkupEditor_FormClosing` for the form). Dynamically created menu items may use a descriptive suffix (e.g. `fileRecentDocumentsEntry_Click`).
 - Prefer the BCL keyword **`object`** over **`System.Object`** for handler parameters.
-- Always update Agents.md when making a change to the application code.
+- When adding or changing application functionality, update both `README.md` and `Agents.md`: document user-facing features and workflows in `README.md`, and keep implementation details and agent guidance accurate in `Agents.md`.
 - Always use a separate file for each class.
 - UI layout is built in `MarkupEditor.Designer.cs`; event handlers are wired in `MarkupEditor.cs`.
 - All `*.Designer.cs` files are Visual Studio generated; never place custom hand-authored logic there because regeneration can overwrite it.

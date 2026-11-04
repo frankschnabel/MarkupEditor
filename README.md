@@ -7,15 +7,17 @@ A small **Windows Forms** editor for **Markdown** with a **live HTML preview**. 
 - Split view with selectable orientation: **vertical** (editor left, preview right) or **horizontal** (editor top, preview bottom)
 - **Debounced** automatic preview while typing, backed by **WebView2** for modern Chromium-based rendering
 - **Tools** → **Settings...** (`Ctrl+,`) opens a custom dialog for:
-	- General behavior: Live Preview, Word Wrap, Horizontal Split, Line Numbers, Allow Raw HTML in Preview, and Windows shell integration
+	- General behavior: Live Preview, Word Wrap, Horizontal Split, Line Numbers, independent preview scrolling and current-line highlighting, Allow Raw HTML in Preview, and Windows shell integration
 	- Appearance: font face, text color, and size configured independently for editor text, line numbers, preview text, preview code, and each preview heading level (H1-H6)
-- **File** menu: New, Open, Reload, Save, Save As, **Export as HTML**, **Recent documents** (last 10), Exit
+- **File** menu: New, Open, Reload, Save, Save As, **Print** (`Ctrl+P`), **Export** as PDF, TeX (exprimental), or HTML (`Ctrl+Shift+E`), **Recent documents** (last 10), Exit
 - Unsaved-change prompts when closing, creating a new document, opening another file, or reloading from disk
 - External file-change detection: if the open file is modified, renamed, or deleted by another process, the app alerts you and offers to reload when appropriate
 - UTF-8 open/save; optional **command-line path** to open a file on startup (works with file associations)
-- **Preview follows the caret**: the rendered block for the current source line is scrolled into view and highlighted
+- Preview caret scrolling and current-line highlighting can be enabled independently in Settings
+- **Tools** → **Scroll to Current Line** (`F6`) scrolls the preview to the editor caret line even when automatic preview scrolling is disabled
+- When automatic caret scrolling is disabled, live preview refreshes preserve the current preview position; New and Open start at the top
 - Optional **line-number gutter** for the editor when word wrap is off
-- Settings remembered between sessions: live preview, word wrap, split orientation, line numbers, raw HTML policy, per-element font appearance including H1-H6, splitter distance, and window layout
+- Settings remembered between sessions: live preview, word wrap, split orientation, line numbers, preview caret scrolling and highlighting, raw HTML policy, Windows shell integration, per-element font appearance including H1-H6, splitter distance, and window layout
 - **Help** → Supported Markup summarizes the syntax and preview behavior
 
 ## Requirements
