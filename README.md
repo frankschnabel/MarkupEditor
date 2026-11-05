@@ -5,6 +5,7 @@ A small **Windows Forms** editor for **Markdown** with a **live HTML preview**. 
 ## Features
 
 - Split view with selectable orientation: **vertical** (editor left, preview right) or **horizontal** (editor top, preview bottom)
+- Large-document editing with a `RichTextBox` editor configured beyond the standard `TextBox` 32 KB input limit
 - **Debounced** automatic preview while typing, backed by **WebView2** for modern Chromium-based rendering
 - **Tools** → **Settings...** (`Ctrl+,`) opens a custom dialog for:
 	- General behavior: Live Preview, Word Wrap, Horizontal Split, Line Numbers, independent preview scrolling and current-line highlighting, Allow Raw HTML in Preview, and Windows shell integration

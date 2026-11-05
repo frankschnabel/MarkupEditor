@@ -623,7 +623,9 @@ internal sealed partial class MarkupEditor : Form
         _highlightPreviewLine = s.HighlightPreviewLine;
 
         _editorTextBox.WordWrap = s.WordWrap;
-        _editorTextBox.ScrollBars = _editorTextBox.WordWrap ? ScrollBars.Vertical : ScrollBars.Both;
+        _editorTextBox.ScrollBars = _editorTextBox.WordWrap
+            ? RichTextBoxScrollBars.Vertical
+            : RichTextBoxScrollBars.Both;
 
         _editorFontSettings =
             CreateStoredFontSettings(s.EditorFontFamily, s.EditorFontColor,
@@ -1364,7 +1366,9 @@ internal sealed partial class MarkupEditor : Form
         if (_editorTextBox.WordWrap != dialog.WordWrap)
         {
             _editorTextBox.WordWrap = dialog.WordWrap;
-            _editorTextBox.ScrollBars = _editorTextBox.WordWrap ? ScrollBars.Vertical : ScrollBars.Both;
+            _editorTextBox.ScrollBars = _editorTextBox.WordWrap
+                ? RichTextBoxScrollBars.Vertical
+                : RichTextBoxScrollBars.Both;
         }
 
         Boolean newHorizontal = dialog.HorizontalSplit;

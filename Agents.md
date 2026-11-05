@@ -5,6 +5,7 @@ MarkupEditor is a lightweight Windows Forms application (.NET 8 for Windows) for
 
 The app now includes:
 - A left editor pane for writing Markdown text.
+- A `RichTextBox` editor configured beyond the standard `TextBox` 32 KB input limit for large documents.
 - A right preview pane rendered as HTML.
 - A full menu bar with File, Edit, Tools (with Settings), and Help menus.
 - Automatic preview refresh (debounced) as the user types.
@@ -49,8 +50,8 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 - `Program.cs` — entry point.
 - `MarkupEditor.cs` — application logic and event wiring.
 - `MarkupEditor.Designer.cs` — declarative UI layout.
-- `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
-- `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `TextBox` only.
+- `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `RichTextBox` only.
+- `FindReplaceDialog.cs` / `FindReplaceDialog.Designer.cs` — modal find/replace for the editor `RichTextBox` only.
 - `SettingsDialog.cs` / `SettingsDialog.Designer.cs` — modal Settings dialog with a left category list and right settings page; exposes general behavior settings, independent preview caret scrolling/highlighting options, and independent font face/color/size for editor text, line numbers, preview text, preview code, and each preview heading level (H1-H6).
 - `DisplayFontSettings.cs` — immutable font face, color, and size configuration used by the settings dialog and renderers.
 - `WindowsShellNewMarkdownRegistration.cs` — creates/removes per-user registry keys for the Explorer New-menu Markdown document entry.
@@ -100,7 +101,7 @@ For full syntax rules, see the [CommonMark spec](https://spec.commonmark.org/) a
 	- `MenuStrip` with File, Edit, Tools/Settings, Help menus.
 	- Designer Click handlers wire File/Edit/Tools/Help menu commands directly to form methods.
 	- `SplitContainer` (left editor, right preview).
-	- `TextBox` multiline editor (`Consolas`, 11pt, tabs, no wrap).
+	- `RichTextBox` multiline editor (`Consolas`, 11pt, tabs, no wrap), with the character limit set to the Rich Edit maximum and URL detection disabled to preserve plain-text Markdown editing.
 	- `WebBrowser` for HTML preview.
 	- `StatusStrip` with file path and modified state.
 	- `Timer` (300 ms debounce for live preview).

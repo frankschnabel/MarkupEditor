@@ -69,7 +69,7 @@ namespace MarkupEditor
             helpSep = new System.Windows.Forms.ToolStripSeparator();
             helpAbout = new System.Windows.Forms.ToolStripMenuItem();
             _mainSplit = new System.Windows.Forms.SplitContainer();
-            _editorTextBox = new System.Windows.Forms.TextBox();
+            _editorTextBox = new System.Windows.Forms.RichTextBox();
             _previewBrowser = new Microsoft.Web.WebView2.WinForms.WebView2();
             _statusStrip = new System.Windows.Forms.StatusStrip();
             _fileStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -384,11 +384,12 @@ namespace MarkupEditor
             _editorTextBox.HideSelection = false;
             _editorTextBox.Location = new System.Drawing.Point(0, 0);
             _editorTextBox.Margin = new System.Windows.Forms.Padding(0);
-            _editorTextBox.Multiline = true;
+            _editorTextBox.MaxLength = 2147483646;
             _editorTextBox.Name = "_editorTextBox";
-            _editorTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            _editorTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Both;
             _editorTextBox.Size = new System.Drawing.Size(512, 595);
             _editorTextBox.TabIndex = 0;
+            _editorTextBox.DetectUrls = false;
             _editorTextBox.WordWrap = false;
             // 
             // _previewBrowser
@@ -461,7 +462,7 @@ namespace MarkupEditor
 
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.SplitContainer _mainSplit;
-        private System.Windows.Forms.TextBox _editorTextBox;
+        private System.Windows.Forms.RichTextBox _editorTextBox;
         private Microsoft.Web.WebView2.WinForms.WebView2 _previewBrowser;
         private LineNumberPanel _lineNumberPanel;
         private System.Windows.Forms.StatusStrip _statusStrip;
@@ -507,4 +508,3 @@ namespace MarkupEditor
         private System.Windows.Forms.ToolStripMenuItem helpAbout;
     }
 }
-

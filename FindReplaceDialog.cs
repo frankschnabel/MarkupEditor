@@ -6,19 +6,19 @@ using System.Windows.Forms;
 namespace MarkupEditor;
 
 /// <summary>
-/// Modal find/replace UI for a single multiline <see cref="TextBox"/>.
+/// Modal find/replace UI for a single multiline <see cref="RichTextBox"/>.
 /// </summary>
 internal sealed partial class FindReplaceDialog : Form
 {
-    private readonly TextBox _targetTextBox;
+    private readonly RichTextBox _targetTextBox;
     private readonly Boolean _initialFocusOnReplace;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FindReplaceDialog"/> class.
     /// </summary>
-    /// <param name="targetTextBox">The editor text box to search and modify.</param>
+    /// <param name="targetTextBox">The editor rich text box to search and modify.</param>
     /// <param name="initialFocusOnReplace">When true, focus moves to the Replace field on load.</param>
-    public FindReplaceDialog(TextBox targetTextBox, Boolean initialFocusOnReplace)
+    public FindReplaceDialog(RichTextBox targetTextBox, Boolean initialFocusOnReplace)
     {
         _targetTextBox = targetTextBox ?? throw new ArgumentNullException(nameof(targetTextBox));
         _initialFocusOnReplace = initialFocusOnReplace;

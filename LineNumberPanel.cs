@@ -6,8 +6,8 @@ using System.Windows.Forms;
 namespace MarkupEditor;
 
 /// <summary>
-/// A panel that renders logical line numbers aligned to the visible rows of a sibling <see cref="TextBox"/>.
-/// Line numbers are only painted when the associated <see cref="TextBox"/> has word wrap disabled.
+/// A panel that renders logical line numbers aligned to the visible rows of a sibling <see cref="RichTextBox"/>.
+/// Line numbers are only painted when the associated <see cref="RichTextBox"/> has word wrap disabled.
 /// </summary>
 internal sealed class LineNumberPanel : Panel
 {
@@ -18,13 +18,13 @@ internal sealed class LineNumberPanel : Panel
     [DllImport("user32.dll")]
     private static extern IntPtr SendMessage(IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam);
 
-    private readonly TextBox _textBox;
+    private readonly RichTextBox _textBox;
 
     /// <summary>
-    /// Initializes a new <see cref="LineNumberPanel"/> linked to the given editor <see cref="TextBox"/>.
+    /// Initializes a new <see cref="LineNumberPanel"/> linked to the given editor <see cref="RichTextBox"/>.
     /// </summary>
     /// <param name="textBox">The editor text box whose line numbers are displayed.</param>
-    internal LineNumberPanel(TextBox textBox)
+    internal LineNumberPanel(RichTextBox textBox)
     {
         _textBox = textBox;
         DoubleBuffered = true;
@@ -71,7 +71,7 @@ internal sealed class LineNumberPanel : Panel
     }
 
     /// <summary>
-    /// Paints line numbers aligned to the visible rows of the linked text box.
+    /// Paints line numbers aligned to the visible rows of the linked rich text box.
     /// Nothing is painted when word wrap is enabled (line positions would be inaccurate).
     /// </summary>
     /// <param name="e">Paint event data.</param>
@@ -110,7 +110,7 @@ internal sealed class LineNumberPanel : Panel
     }
 
     /// <summary>
-    /// Returns the index of the first visible physical line in the linked text box.
+    /// Returns the index of the first visible physical line in the linked rich text box.
     /// </summary>
     private Int32 GetFirstVisibleLine() =>
         (Int32)SendMessage(_textBox.Handle, EmGetFirstVisibleLine, IntPtr.Zero, IntPtr.Zero);
@@ -123,7 +123,7 @@ internal sealed class LineNumberPanel : Panel
         (Int32)SendMessage(_textBox.Handle, EmLineIndex, lineNumber, IntPtr.Zero);
 
     /// <summary>
-    /// Returns the client-area pixel position of the given character index in the text box.
+    /// Returns the client-area pixel position of the given character index in the rich text box.
     /// </summary>
     /// <param name="charIndex">The character index to locate.</param>
     private Point GetCharPosition(Int32 charIndex)
